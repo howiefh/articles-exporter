@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<settings> 
+  <general>
+    <version>1.0</version>
+    <userAgent>Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/39.0.2171.65 Chrome/39.0.2171.65 Safari/537.36</userAgent>
+    <readTimeout>10000</readTimeout>
+    <connectionTimeout>10000</connectionTimeout>
+    <cssPath>css/</cssPath>
+    <mediaPath>media/</mediaPath>
+    <jsPath>js/</jsPath>
+    <markdown>GITHUB</markdown>
+  </general>
+</settings>
