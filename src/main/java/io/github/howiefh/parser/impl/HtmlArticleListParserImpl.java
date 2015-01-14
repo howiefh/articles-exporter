@@ -20,6 +20,9 @@ public class HtmlArticleListParserImpl implements ArticleListParser{
 	private int startPage = 1;
 	private int pageCount = 1;
 	private String selector="";
+	
+	private String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/39.0.2171.65 Chrome/39.0.2171.65 Safari/537.36";
+	private int connectionTimeout=10*1000;
 	public HtmlArticleListParserImpl(){
 		
 	}
@@ -29,7 +32,7 @@ public class HtmlArticleListParserImpl implements ArticleListParser{
 		this.selector = selector;
 	}
 	@Override
-	public List<HtmlLink> articleLinkList() {
+	public List<HtmlLink> articleLinkList() throws IOException {
 		List<HtmlLink> articleLinks = new ArrayList<HtmlLink>();
 		selector = selector + " a[href]";
 		for (int i = startPage; i <= pageCount ; i++) {
@@ -72,17 +75,18 @@ public class HtmlArticleListParserImpl implements ArticleListParser{
 	 * 获取文章列表页面的Document
 	 * @param pageIndex
 	 * @return
+	 * @throws IOException 
 	 */
-	private Document getListPageDocument(int pageIndex){
+	private Document getListPageDocument(int pageIndex) throws IOException{
 		try {
 			String url = GeneralOptions.getInstance().getArticleListPageLink();
 			String newUrl = String.format(url, pageIndex);
-			Document doc = JsoupUtil.get(newUrl);
+			Document doc = JsoupUtil.get(newUrl, userAgent, connectionTimeout);
 			return doc;
 		} catch (IOException e) {
 			LogUtil.log().error(e.getMessage());
+			throw e;
 		}
-		return null;
 	}
 
 	public int getStartPage() {
@@ -107,6 +111,18 @@ public class HtmlArticleListParserImpl implements ArticleListParser{
 
 	public void setSelector(String selector) {
 		this.selector = selector;
+	}
+	public String getUserAgent() {
+		return userAgent;
+	}
+	public void setUserAgent(String userAgent) {
+		this.userAgent = userAgent;
+	}
+	public int getConnectionTimeout() {
+		return connectionTimeout;
+	}
+	public void setConnectionTimeout(int connectionTimeout) {
+		this.connectionTimeout = connectionTimeout;
 	}
 	
 }

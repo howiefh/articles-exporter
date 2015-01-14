@@ -107,12 +107,12 @@ public class GeneralConfig extends Config{
 		return "GeneralConfig ["
 				+ "version=" + version
 				+ ", userAgent="+userAgent
-				+", readTimeout"+readTimeout
-				+", connectionTimeout"+connectionTimeout
-				+", cssPath"+cssPath
-				+", mediaPath"+mediaPath
-				+", jsPath"+jsPath
-				+", markdown"+markdown
+				+", readTimeout="+readTimeout
+				+", connectionTimeout="+connectionTimeout
+				+", cssPath="+cssPath
+				+", mediaPath="+mediaPath
+				+", jsPath="+jsPath
+				+", markdown="+markdown
 				+"]";
 	}
 }

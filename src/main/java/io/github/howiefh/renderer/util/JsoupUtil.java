@@ -1,7 +1,5 @@
 package io.github.howiefh.renderer.util;
 
-import io.github.howiefh.conf.GeneralConfig;
-
 import java.io.IOException;
 
 import org.jsoup.Jsoup;
@@ -10,8 +8,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class JsoupUtil {
-	public static Document get(String url) throws IOException {
-		return Jsoup.connect(url).userAgent(GeneralConfig.userAgent).timeout(GeneralConfig.connectionTimeout).get();
+	public static Document get(String url, String userAgent, int timeout) throws IOException {
+		return Jsoup.connect(url).userAgent(userAgent).timeout(timeout).get();
 	}
 	public static void removeFontFamily(Document doc) {
 		Elements elements = doc.select("[style]");

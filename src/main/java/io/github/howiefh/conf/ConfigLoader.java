@@ -21,8 +21,9 @@ public class ConfigLoader {
 			xmlUtil = new XmlUtil(CONFIG_PATH);
 			xmlUtil.read(gConfig);
 			LogUtil.log().info(gConfig.toString());
+			isLoadConfOK = true;
 		} catch (FileNotFoundException e) {
-			isLoadConfOK = false;
+			LogUtil.log().error(e.getMessage());
 		}
 		
 		//加载配置文件失败,由程序自己初始化参数

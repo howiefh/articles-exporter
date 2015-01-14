@@ -38,6 +38,7 @@ public class PreProcesser {
 	private String cssPath = "css/";
 	private String mediaPath = "media/";
 	private String jsPath = "js/";
+	private String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/39.0.2171.65 Chrome/39.0.2171.65 Safari/537.36";
 	private int readTimeout = 10*1000;
 	private int connectionTimeout=10*1000;
 	public PreProcesser() {
@@ -46,27 +47,29 @@ public class PreProcesser {
 	 * 获取文章的正文的Document
 	 * @param link
 	 * @return
+	 * @throws IOException 
 	 */
-	public Document newDocumentFromArticleContent(HtmlLink link) {
+	public Document newDocumentFromArticleContent(HtmlLink link) throws IOException {
 		try {
-			Document doc = JsoupUtil.get(link.getHref());
+			Document doc = JsoupUtil.get(link.getHref(), userAgent, connectionTimeout);
 			Element content = doc.select(selector).first();
 			String html = beforeHTML+content.toString()+afterHTML;
 			Document res = Jsoup.parse(html, doc.baseUri()); 
 			res.title(link.getContent());
 			return res;
 		} catch (IOException e) {
-			LogUtil.log().error(e.getMessage());
+			LogUtil.log().error(e.getMessage()+" : "+link.getContent()+" : "+link.getHref());
+			throw e;
 		}
-		return null;
 	}
 	
 	/**
 	 * 进行预处理，获取文章正文，并将正文中的资源文件保存到本地
 	 * @param link
 	 * @return
+	 * @throws Exception 
 	 */
-	public Document process(HtmlLink link) {
+	public Document process(HtmlLink link) throws Exception {
 		String url = link.getHref();
 		Document doc = null;
 		try {
@@ -74,9 +77,9 @@ public class PreProcesser {
 			makeHtmlLinkFile(doc, tempPath, connectionTimeout, readTimeout);// 根据网页中css、js、img链接地址及文件名生成本地文件
 		    doc.select("html").before("<!-- saved from url=("+new DecimalFormat("0000").format(url.length())+")"+url+" -->");
 		    doc.body().prepend("<h1><a name='"+link.getUuid()+"'>"+link.getContent()+"</a></h1>");
-		} catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException | IOException e) {
 			LogUtil.log().error("访问页面地址 : " + url + "失败."+e.getMessage());
-			return doc;
+			throw e;
 		}
 		return doc;
 	}
@@ -224,6 +227,12 @@ public class PreProcesser {
 	}
 	public void setTempPath(String tempPath) {
 		this.tempPath = tempPath;
+	}
+	public String getUserAgent() {
+		return userAgent;
+	}
+	public void setUserAgent(String userAgent) {
+		this.userAgent = userAgent;
 	}
 	
 }
