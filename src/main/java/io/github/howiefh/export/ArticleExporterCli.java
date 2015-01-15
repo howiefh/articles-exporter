@@ -1,10 +1,6 @@
 package io.github.howiefh.export;
 
-import io.github.howiefh.conf.ConfigLoader;
-import io.github.howiefh.conf.GeneralConfig;
-import io.github.howiefh.conf.GeneralOptions;
-import io.github.howiefh.conf.RendererRegister;
-import io.github.howiefh.conf.PropertiesHelper;
+import io.github.howiefh.conf.*;
 import io.github.howiefh.conf.RendererRegister.RendererTuple;
 import io.github.howiefh.parser.ArticleListParser;
 import io.github.howiefh.parser.impl.HtmlArticleListParserImpl;
@@ -52,8 +48,7 @@ public class ArticleExporterCli {
 	public static final String AFTER_HTML="</body>"
 			+ "</html>";
 	private static String encoding  = "UTF-8";
-	private static int threadCount=8;
-	private static ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+	private static ExecutorService executor = Executors.newFixedThreadPool(GeneralConfig.threads);
 	private static ArticleListParser htmlArticleListParserImpl;
 	private static File tempDir;
 	private static List<HtmlLink> htmlLinks = new ArrayList<HtmlLink>();
@@ -61,7 +56,8 @@ public class ArticleExporterCli {
 	
 	public static void export(String[] args) {
 		try {
-			initConfig();
+			Config[] configs = {GeneralConfig.getInstance()};
+			initConfig(configs);
 			initParsers();
 			if (initOptions(args)) {
 				articleList();
@@ -74,8 +70,8 @@ public class ArticleExporterCli {
 		}
 	}
 
-	private static void initConfig() {
-		ConfigLoader.loadConfig();
+	public static void initConfig(Config[] configs) {
+		ConfigLoader.loadConfig(configs);
 		PropertiesHelper.load();
 	}
 	

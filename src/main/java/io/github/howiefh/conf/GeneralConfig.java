@@ -24,6 +24,7 @@ public class GeneralConfig extends Config{
 	public static String mediaPath = "media/";
 	public static String jsPath = "js/";
 	public static Markdown markdown = Markdown.GITHUB;
+	public static int threads = 8;
 
 	public static final String CONFIG_PATH = "conf/";
 	public static final String TEMP_PATH = "temp/";
@@ -50,7 +51,7 @@ public class GeneralConfig extends Config{
 	 */
 	@Override
 	public Element generateNodeUnder(Element parentElm) {
-		Element generalElm=parentElm.addElement("general");
+		Element generalElm=parentElm.addElement(getElementName());
 		
 		Element element=generalElm.addElement("version");
 		element.setText(version);
@@ -68,6 +69,8 @@ public class GeneralConfig extends Config{
 		element.setText(jsPath);
 		element = generalElm.addElement("markdown");
 		element.setText(""+markdown);
+		element = generalElm.addElement("threads");
+		element.setText(""+threads);
 		
 		return generalElm;
 	}
@@ -88,6 +91,7 @@ public class GeneralConfig extends Config{
 		mediaPath = nodeElm.elementText("mediaPath");
 		jsPath = nodeElm.elementText("jsPath");
 		markdown = Markdown.valueOf(nodeElm.elementText("markdown"));
+		threads = Integer.valueOf(nodeElm.elementText("threads"));
 		return true;
 	}
 	
@@ -96,7 +100,7 @@ public class GeneralConfig extends Config{
 	 */
 	@Override
 	public String getElementName() {
-		return new String("general");
+		return "general";
 	}
 	
 	public static GeneralConfig getInstance() {
@@ -113,6 +117,7 @@ public class GeneralConfig extends Config{
 				+", mediaPath="+mediaPath
 				+", jsPath="+jsPath
 				+", markdown="+markdown
+				+", threads="+threads
 				+"]";
 	}
 }

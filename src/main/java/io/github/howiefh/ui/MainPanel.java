@@ -119,7 +119,7 @@ public class MainPanel extends JPanel {
 		Object[] columnNames = {Status.SELECTED,"文章标题","结果"};
 		Object[][] data = {};
 		
-		JButton btnChooseDir = new JButton("选择路径");
+		JButton btnChooseDir = new JButton("选择目录");
 		GridBagConstraints gbc_btnChooseDir = new GridBagConstraints();
 		gbc_btnChooseDir.insets = new Insets(0, 0, 5, 5);
 		gbc_btnChooseDir.gridx = 6;

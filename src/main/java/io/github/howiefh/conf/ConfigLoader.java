@@ -14,29 +14,31 @@ public class ConfigLoader {
 	 * 加载配置文件
 	 * @return
 	 */
-	public static boolean loadConfig() {
+	public static boolean loadConfig(Config[] configs) {
 		isLoadConfOK = false;
-		GeneralConfig gConfig = GeneralConfig.getInstance();
 		try {
 			xmlUtil = new XmlUtil(CONFIG_PATH);
-			xmlUtil.read(gConfig);
-			LogUtil.log().info(gConfig.toString());
+			for (Config config : configs) {
+				xmlUtil.read(config);
+				LogUtil.log().info(config.toString());
+			}
 			isLoadConfOK = true;
 		} catch (FileNotFoundException e) {
 			LogUtil.log().error(e.getMessage());
 		}
-		
 		//加载配置文件失败,由程序自己初始化参数
 		if (!isLoadConfOK) {
-			initConfig();
+			initConfig(configs);
 		}
 		return isLoadConfOK;
 	}
 	
-	private static void initConfig() {
+	private static void initConfig(Config[] configs) {
 		try {
-			xmlUtil = new XmlUtil(CONFIG_PATH, true);
-			xmlUtil.update(GeneralConfig.getInstance());
+			for (Config config : configs) {
+				xmlUtil = new XmlUtil(CONFIG_PATH, true);
+				xmlUtil.update(config);
+			}
 		} catch (FileNotFoundException e) {
 			LogUtil.log().error(e.getMessage());
 		}

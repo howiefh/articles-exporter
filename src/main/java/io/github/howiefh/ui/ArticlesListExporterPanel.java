@@ -8,7 +8,7 @@ import javax.swing.JTextField;
 import java.awt.Insets;
 import javax.swing.JComboBox;
 
-public class ArticlesExporterPanel extends JPanel {
+public class ArticlesListExporterPanel extends JPanel {
 
 	private static final long serialVersionUID = -3096400336620302257L;
 	private JTextField textFieldLink;
@@ -18,7 +18,7 @@ public class ArticlesExporterPanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public ArticlesExporterPanel() {
+	public ArticlesListExporterPanel() {
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{60, 120, 60, 60, 60, 60, 60, 100, 0};
 		int rowHeight = 30;

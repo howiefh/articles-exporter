@@ -97,6 +97,16 @@
 			<artifactId>itext-asian</artifactId>
 			<version>5.2.0</version>
 		</dependency>
-	</dependencies>
 
+		<dependency>
+			<groupId>de.sciss</groupId>
+			<artifactId>weblaf-core</artifactId>
+			<version>1.28</version>
+		</dependency>
+		<dependency>
+			<groupId>de.sciss</groupId>
+			<artifactId>weblaf-ui</artifactId>
+			<version>1.28</version>
+		</dependency>
+	</dependencies>
 </project>
