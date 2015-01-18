@@ -1,6 +1,6 @@
 package io.github.howiefh.example;
 
-import io.github.howiefh.parser.impl.HtmlArticleListParserImpl;
+import io.github.howiefh.export.ArticleExporter;
 import io.github.howiefh.renderer.HtmlLink;
 import io.github.howiefh.renderer.LinkType;
 
@@ -67,7 +67,7 @@ public class PDFBookmark {
     	HtmlLink link = new HtmlLink("#bookMark", "bookmark", LinkType.LINK);
     	links.add(link);
     	Document document = Jsoup.parse(html);
-    	document.head().append(new HtmlArticleListParserImpl().generateBookmark(links));
+    	document.head().append(ArticleExporter.generateBookmark(links));
     	System.out.println(document);
 	}
 }

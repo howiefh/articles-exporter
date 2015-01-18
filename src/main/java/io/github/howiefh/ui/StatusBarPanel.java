@@ -1,5 +1,6 @@
 package io.github.howiefh.ui;
 
+import io.github.howiefh.export.Message;
 import io.github.howiefh.ui.statusbar.FreeGCButton;
 import io.github.howiefh.ui.statusbar.FreeMemoryBar;
 import io.github.howiefh.ui.statusbar.FreeStatusMessageLabel;
@@ -17,7 +18,7 @@ import java.awt.GridBagConstraints;
 import java.awt.Color;
 import java.awt.Insets;
 
-public class StatusBarPanel extends JPanel {
+public class StatusBarPanel extends JPanel  implements Message{
 
 	/**
 	 * 
@@ -91,6 +92,21 @@ public class StatusBarPanel extends JPanel {
 			g2d.setPaint(Color.GRAY);
 			g2d.drawLine(0, 0, getWidth() - 1, 0);
 		}
+	}
+
+	@Override
+	public void warn(String text) {
+		lblStatusMessage.warn(text);
+	}
+
+	@Override
+	public void info(String text) {
+		lblStatusMessage.info(text);
+	}
+
+	@Override
+	public void error(String text) {
+		lblStatusMessage.error(text);
 	}
 
 }

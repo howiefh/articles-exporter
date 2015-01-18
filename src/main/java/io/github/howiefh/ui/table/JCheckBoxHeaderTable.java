@@ -1,13 +1,19 @@
 package io.github.howiefh.ui.table;
 
 import io.github.howiefh.ui.table.JCheckBoxHeaderTable.Status;
+import io.github.howiefh.util.IOUtil;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.EventQueue;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
+
+import com.alee.laf.WebLookAndFeel;
 
 public class JCheckBoxHeaderTable extends JScrollPane{
 	public static enum Status {
@@ -35,15 +41,12 @@ public class JCheckBoxHeaderTable extends JScrollPane{
 
 		TableCellRenderer tCellRenderer = new HeaderRenderer(table.getTableHeader(), 0);
 		table.getColumnModel().getColumn(0).setHeaderRenderer(tCellRenderer);
-		// <ins>
-		TableCellRenderer leftAlign = new LeftAlignHeaderRenderer();
-		table.getColumnModel().getColumn(1).setHeaderRenderer(leftAlign);
-		table.getColumnModel().getColumn(2).setHeaderRenderer(leftAlign);
-		// </ins>
+		table.getColumnModel().getColumn(0).setHeaderValue(columnNames[0]);
+		
 		table.getTableHeader().setReorderingAllowed(false);
 		
 		// 设置第一列列宽
-		int firstColumnWidth = 30;
+		int firstColumnWidth = 36;
 		TableColumn firstColumn = table.getColumnModel().getColumn(0);
 		firstColumn.setPreferredWidth(firstColumnWidth);
 		firstColumn.setMaxWidth(firstColumnWidth);
@@ -66,6 +69,12 @@ public class JCheckBoxHeaderTable extends JScrollPane{
 	public void removeRow(int row){
 		dtm.removeRow(row);
 	}
+	public void clear(){
+		int len = dtm.getRowCount();
+		for (int i = 0; i < len; i++) {
+			removeRow(0);
+		}
+	}
 	public  void setRowCount(int rowCount) {
 		dtm.setRowCount(rowCount);
 	}
@@ -80,6 +89,14 @@ public class JCheckBoxHeaderTable extends JScrollPane{
 	}
 	public JTable getTable(){
 		return table;
+	}
+	public Object[] getColumnData(int column){
+		int rows= dtm.getRowCount();
+		List<Object> list = new ArrayList<Object>();
+		for (int i = 0; i < rows; i++) {
+			list.add(dtm.getValueAt(i, column));
+		}
+		return list.toArray();
 	}
 
 	public Object[] getColumnNames() {
@@ -99,19 +116,17 @@ public class JCheckBoxHeaderTable extends JScrollPane{
 			@Override
 			public void run() {
 				try {
-					// UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-					for (UIManager.LookAndFeelInfo laf : UIManager
-							.getInstalledLookAndFeels())
-						if ("Nimbus".equals(laf.getName()))
-							UIManager.setLookAndFeel(laf.getClassName());
+					UIManager.setLookAndFeel(WebLookAndFeel.class.getCanonicalName());
+//					UIManager.setLookAndFeel(NimbusLookAndFeel.class.getCanonicalName());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				Object[] columnNames = {Status.INDETERMINATE, "Title", "Title"};  
+				Object[] columnNames = {Status.DESELECTED, "Title", "Title"};  
 				Object[][] data = {{true,1,2},{true,1,2}};  
 				JFrame frame = new JFrame();
 				frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-				frame.getContentPane().add(new JCheckBoxHeaderTable(columnNames,data));
+				JCheckBoxHeaderTable checkBoxHeaderTable = new JCheckBoxHeaderTable(columnNames,data);
+				frame.getContentPane().add(checkBoxHeaderTable);
 				frame.setSize(320, 240);
 				frame.setLocationRelativeTo(null);
 				frame.setVisible(true);
@@ -120,9 +135,12 @@ public class JCheckBoxHeaderTable extends JScrollPane{
 	}
 }
 
-class HeaderRenderer extends JCheckBox implements TableCellRenderer {
+class HeaderRenderer extends JLabel implements TableCellRenderer {
 	private static final long serialVersionUID = 4289281894163425308L;
-
+	private static Icon iconSelected= IOUtil.loadIcon("checked.gif");
+	private static Icon iconDisabled=IOUtil.loadIcon("unchecked-disabled.gif");
+	private static Icon iconDisabledSelected=IOUtil.loadIcon("checked-disabled.gif");
+	private static Icon icon= IOUtil.loadIcon("unchecked.gif");
 	public HeaderRenderer(JTableHeader header, final int targetColumnIndex) {
 		super((String) null);
 		setOpaque(false);
@@ -139,7 +157,7 @@ class HeaderRenderer extends JCheckBox implements TableCellRenderer {
 				if (mci == targetColumnIndex) {
 					TableColumn column = columnModel.getColumn(vci);
 					Object v = column.getHeaderValue();
-					boolean b = Status.DESELECTED.equals(v) ? true : false;
+					boolean b = Status.DESELECTED.equals(v)? true : false;
 					TableModel m = table.getModel();
 					for (int i = 0; i < m.getRowCount(); i++)
 						m.setValueAt(b, i, mci);
@@ -156,68 +174,20 @@ class HeaderRenderer extends JCheckBox implements TableCellRenderer {
 		if (val instanceof Status) {
 			switch ((Status) val) {
 			case SELECTED:
-				setSelected(true);
-				setEnabled(true);
+				setIcon(iconSelected);
 				break;
 			case DESELECTED:
-				setSelected(false);
-				setEnabled(true);
+				setIcon(icon);
 				break;
 			case INDETERMINATE:
-				setSelected(true);
-				setEnabled(false);
+				setIcon(iconDisabledSelected);
 				break;
 			}
 		} else {
-			setSelected(true);
-			setEnabled(false);
+			setIcon(iconDisabled);
 		}
-		TableCellRenderer r = tbl.getTableHeader().getDefaultRenderer();
-		JLabel lable = (JLabel) r.getTableCellRendererComponent(tbl, null, isS,
-				hasF, row, col);
-
-		lable.setIcon(new CheckBoxIcon(this));
-		lable.setText(null); // XXX Nimbus LnF ???
-		lable.setHorizontalAlignment(JLabel.CENTER);
-		return lable;
-	}
-}
-
-class LeftAlignHeaderRenderer implements TableCellRenderer {
-	@Override
-	public Component getTableCellRendererComponent(JTable t, Object v,
-			boolean isS, boolean hasF, int row, int col) {
-		TableCellRenderer r = t.getTableHeader().getDefaultRenderer();
-		JLabel l = (JLabel) r.getTableCellRendererComponent(t, v, isS, hasF,
-				row, col);
-		l.setHorizontalAlignment(JLabel.CENTER);
-		return l;
-	}
-}
-
-
-
-class CheckBoxIcon implements Icon {
-	private final JCheckBox check;
-
-	public CheckBoxIcon(JCheckBox check) {
-		this.check = check;
-	}
-
-	@Override
-	public int getIconWidth() {
-		return check.getPreferredSize().width;
-	}
-
-	@Override
-	public int getIconHeight() {
-		return check.getPreferredSize().height;
-	}
-
-	@Override
-	public void paintIcon(Component c, Graphics g, int x, int y) {
-		SwingUtilities.paintComponent(g, check, (Container) c, x, y,
-				getIconWidth(), getIconHeight());
+		setHorizontalAlignment(JLabel.CENTER);
+		return this;
 	}
 }
 

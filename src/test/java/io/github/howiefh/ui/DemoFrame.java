@@ -32,6 +32,9 @@ public class DemoFrame extends JFrame {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        //Make sure we have nice window decorations.
+        JFrame.setDefaultLookAndFeelDecorated(true);
+        
 		new DemoFrame().setVisible(true);
 		System.out.println(textField.getAlignmentX());
 		System.out.println(textField.getAutoscrolls());

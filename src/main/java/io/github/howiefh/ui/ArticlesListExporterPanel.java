@@ -1,5 +1,11 @@
 package io.github.howiefh.ui;
 
+import io.github.howiefh.conf.GeneralOptions;
+import io.github.howiefh.conf.PropertiesHelper;
+import io.github.howiefh.export.ArticleExporter;
+import io.github.howiefh.export.Message;
+import io.github.howiefh.util.LogUtil;
+
 import javax.swing.JPanel;
 
 import java.awt.Dimension;
@@ -12,6 +18,8 @@ import java.awt.GridBagConstraints;
 import javax.swing.JTextField;
 
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JComboBox;
 import javax.swing.JButton;
@@ -30,11 +38,16 @@ public class ArticlesListExporterPanel extends JPanel {
 	private SpinnerNumberModel startPageNumberModel; 
 	private SpinnerNumberModel pageCountNumberModel;
 	private JComboBox<String> comboBoxRule;
-
+	private JButton btnArticlesList;
+	private MainPanel panel;
+	
+	private Message message;
 	/**
 	 * Create the panel.
 	 */
-	public ArticlesListExporterPanel() {
+	public ArticlesListExporterPanel(Message message) {
+		this.message = message;
+		
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{60, 120, 60, 40, 60, 40, 60, 100, 60, 0};
 		int rowHeight = 0;
@@ -111,21 +124,56 @@ public class ArticlesListExporterPanel extends JPanel {
 		gbc_comboBox.gridy = 0;
 		add(comboBoxRule, gbc_comboBox);
 		
-		JButton btnArticlesList = new JButton("获取列表");
+		btnArticlesList = new JButton("获取列表");
 		GridBagConstraints gbc_btnArticlesList = new GridBagConstraints();
 		gbc_btnArticlesList.insets = new Insets(5, 0, 5, 5);
 		gbc_btnArticlesList.gridx = 8;
 		gbc_btnArticlesList.gridy = 0;
 		add(btnArticlesList, gbc_btnArticlesList);
 		
-		MainPanel panel = new MainPanel();
+		panel = new MainPanel(message);
 		GridBagConstraints gbc_panel = new GridBagConstraints();
+		gbc_panel.insets = new Insets(5, 0, 5, 0);
 		gbc_panel.gridwidth = 9;
 		gbc_panel.gridheight = 9;
 		gbc_panel.fill = GridBagConstraints.BOTH;
 		gbc_panel.gridx = 0;
 		gbc_panel.gridy = 1;
 		add(panel, gbc_panel);
+		
+		init();
+	}
+	
+	private void init(){
+		for (String ruleName : PropertiesHelper.rules.keySet()) {
+			comboBoxRule.addItem(ruleName);
+		}
+		
+		btnArticlesList.addActionListener(new ArticlesListHandler());
 	}
 
+	private class ArticlesListHandler implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			GeneralOptions.getInstance().setArticleListPageLink(textFieldLink.getText());
+			GeneralOptions.getInstance().setStartPage((Integer)startPageNumberModel.getValue());
+			GeneralOptions.getInstance().setPageCount((Integer)pageCountNumberModel.getValue());
+			GeneralOptions.getInstance().setRuleName((String)comboBoxRule.getSelectedItem());
+			try {
+				panel.fillTable(ArticleExporter.articleList());
+			} catch (Exception e1) {
+				LogUtil.log().error(e1.getMessage());
+			}
+		}
+		
+	}
+
+	public Message getMessage() {
+		return message;
+	}
+
+	public void setMessage(Message message) {
+		this.message = message;
+	}
 }

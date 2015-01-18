@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -35,8 +34,8 @@ public class HtmlArticleListParserImpl implements ArticleListParser{
 	public List<HtmlLink> articleLinkList() throws IOException {
 		List<HtmlLink> articleLinks = new ArrayList<HtmlLink>();
 		selector = selector + " a[href]";
-		for (int i = startPage; i <= pageCount ; i++) {
-			Document doc = getListPageDocument(i);
+		for (int i = 0; i < pageCount ; i++) {
+			Document doc = getListPageDocument(i+startPage);
 			Elements links = doc.select(selector);
 			for (Element link : links) {
 	            HtmlLink articleLink = new HtmlLink(
@@ -49,28 +48,7 @@ public class HtmlArticleListParserImpl implements ArticleListParser{
 		}
 		return articleLinks;
 	}
-	@Override
-	public Element articleLinkListDocument(List<HtmlLink> links) {
-		Document document = Jsoup.parse("<ol></ol>");
-		Element element = document.select("ol").first();
-		for (HtmlLink htmlLink : links) {
-			element.append("<li><a href='#"+htmlLink.getUuid()+"'>"+htmlLink.getContent()+"</a></li>");
-		}
-		return element;
-	}
 	
-	public String generateBookmark(List<HtmlLink> links) {
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("<bookmarks>");
-		for (HtmlLink htmlLink : links) {
-			stringBuilder.append("<bookmark name=\"");
-			stringBuilder.append(htmlLink.getContent() + "\"");
-			stringBuilder.append(" href=\"#");
-			stringBuilder.append(htmlLink.getUuid()+"\"/>");
-		}
-		stringBuilder.append("</bookmarks>");
-		return stringBuilder.toString();
-	}
 	/**
 	 * 获取文章列表页面的Document
 	 * @param pageIndex

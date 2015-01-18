@@ -4,6 +4,7 @@ import io.github.howiefh.conf.Config;
 import io.github.howiefh.conf.ConfigUtil;
 import io.github.howiefh.conf.GeneralConfig;
 import io.github.howiefh.conf.UserAgentsRegister;
+import io.github.howiefh.export.Message;
 import io.github.howiefh.renderer.Markdown;
 import io.github.howiefh.ui.conf.UIConfig;
 import io.github.howiefh.ui.conf.UIOptions;
@@ -55,11 +56,15 @@ public class SettingsPanel extends JPanel {
 	private SpinnerNumberModel spinnerModelThread; 
 	private JComboBox<String> comboBoxMarkdown;
 	private JButton btnSettingOk;
+	
+	private Message message;
 
 	/**
 	 * Create the panel.
 	 */
-	public SettingsPanel() {
+	public SettingsPanel(Message message) {
+		this.message = message;
+		
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 0, 200, 0, 0};
 		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -343,8 +348,19 @@ public class SettingsPanel extends JPanel {
 			if (isChanged) {
 				Config[] configs = {GeneralConfig.getInstance(), UIConfig.getInstance()};
 				ConfigUtil.saveConfig(configs);
+				message.info("配置已更改");
+			} else {
+				message.info("配置未更改");
 			}
 		}
 
+	}
+
+	public Message getMessage() {
+		return message;
+	}
+
+	public void setMessage(Message message) {
+		this.message = message;
 	}
 }

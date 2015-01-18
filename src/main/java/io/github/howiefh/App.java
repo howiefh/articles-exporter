@@ -1,11 +1,11 @@
 package io.github.howiefh;
 
-import io.github.howiefh.export.ArticleExporterCli;
+import io.github.howiefh.export.cli.MainCli;
 
 public class App 
 {
     public static void main( String[] args )
     {
-    	ArticleExporterCli.export(args);
+    	MainCli.export(args);
     }
 }
