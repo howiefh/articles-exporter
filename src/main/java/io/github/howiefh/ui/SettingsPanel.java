@@ -1,9 +1,13 @@
 package io.github.howiefh.ui;
 
+import io.github.howiefh.conf.Config;
+import io.github.howiefh.conf.ConfigUtil;
 import io.github.howiefh.conf.GeneralConfig;
+import io.github.howiefh.conf.UserAgentsRegister;
 import io.github.howiefh.renderer.Markdown;
 import io.github.howiefh.ui.conf.UIConfig;
 import io.github.howiefh.ui.conf.UIOptions;
+import io.github.howiefh.util.IOUtil;
 import io.github.howiefh.util.LogUtil;
 
 import javax.swing.JPanel;
@@ -28,22 +32,26 @@ import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class SettingsPanel extends JPanel {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1158432266211992494L;
-	private JTextField textFieldUserAgent;
-	private JTextField textFieldConnectionTimeout;
-	private JTextField textFieldReadTimeout;
+	private static final int MAX_THREADS = 10;
+	private static final int MIN_THREADS = 1;
+	private static final int MAX_READ_TIMEOUT = 30000;
+	private static final int MIN_READ_TIMEOUT = 1000;
+	private static final int MAX_CONNECTION_TIMEOUT = 30000;
+	private static final int MIN_CONNECTION_TIMEOUT = 1000;
+	
+	private JComboBox<String> comboBoxTheme;
+	private JComboBox<String> comboBoxUA;
+	private SpinnerNumberModel spinnerModelConnectionTimeout; 
+	private SpinnerNumberModel spinnerModelReadTimeout; 
 	private JTextField textFieldCssPath;
 	private JTextField textFieldMediaPath;
 	private JTextField textFieldJsPath;
-	private JComboBox<String> comboBoxTheme;
-	private JSpinner spinnerThreads;
 	private SpinnerNumberModel spinnerModelThread; 
 	private JComboBox<String> comboBoxMarkdown;
 	private JButton btnSettingOk;
@@ -68,7 +76,7 @@ public class SettingsPanel extends JPanel {
 		add(lblTheme, gbc_lblTheme);
 		
 		comboBoxTheme = new JComboBox<String>();
-		comboBoxTheme.setToolTipText("请选择外观");
+		comboBoxTheme.setToolTipText("选择外观");
 		GridBagConstraints gbc_comboBoxTheme = new GridBagConstraints();
 		gbc_comboBoxTheme.insets = new Insets(0, 0, 5, 5);
 		gbc_comboBoxTheme.fill = GridBagConstraints.HORIZONTAL;
@@ -84,16 +92,14 @@ public class SettingsPanel extends JPanel {
 		gbc_lblUserAgent.gridy = 3;
 		add(lblUserAgent, gbc_lblUserAgent);
 		
-		textFieldUserAgent = new JTextField();
-		textFieldUserAgent.setToolTipText("请填入可用的userAgent");
-		textFieldUserAgent.setColumns(10);
-		//TODO textFieldUserAgent 文字不是左边对齐的，Caret被重设了
-		GridBagConstraints gbc_textFieldUserAgent = new GridBagConstraints();
-		gbc_textFieldUserAgent.insets = new Insets(0, 0, 5, 5);
-		gbc_textFieldUserAgent.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textFieldUserAgent.gridx = 2;
-		gbc_textFieldUserAgent.gridy = 3;
-		add(textFieldUserAgent, gbc_textFieldUserAgent);
+		comboBoxUA = new JComboBox<String>();
+		comboBoxUA.setToolTipText("设置浏览器标识");
+		GridBagConstraints gbc_comboBoxUA = new GridBagConstraints();
+		gbc_comboBoxUA.insets = new Insets(0, 0, 5, 5);
+		gbc_comboBoxUA.fill = GridBagConstraints.HORIZONTAL;
+		gbc_comboBoxUA.gridx = 2;
+		gbc_comboBoxUA.gridy = 3;
+		add(comboBoxUA, gbc_comboBoxUA);
 		
 		JLabel lblConnectionTimeout = new JLabel("连接超时:");
 		lblConnectionTimeout.setToolTipText("");
@@ -104,15 +110,20 @@ public class SettingsPanel extends JPanel {
 		gbc_lblConnectionTimeout.gridy = 4;
 		add(lblConnectionTimeout, gbc_lblConnectionTimeout);
 		
-		textFieldConnectionTimeout = new JTextField();
-		textFieldConnectionTimeout.setToolTipText("设置连接服务器的超时时间，单位为毫秒");
-		textFieldConnectionTimeout.setColumns(10);
-		GridBagConstraints gbc_textFieldConnectionTimeout = new GridBagConstraints();
-		gbc_textFieldConnectionTimeout.insets = new Insets(0, 0, 5, 5);
-		gbc_textFieldConnectionTimeout.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textFieldConnectionTimeout.gridx = 2;
-		gbc_textFieldConnectionTimeout.gridy = 4;
-		add(textFieldConnectionTimeout, gbc_textFieldConnectionTimeout);
+		JSpinner spinnerConnectionTimeout = new JSpinner();
+		spinnerConnectionTimeout.setToolTipText("设置连接超时时间，单位毫秒");
+		spinnerConnectionTimeout.setPreferredSize(new Dimension(100,30));
+		GridBagConstraints gbc_spinnerConnectionTimeout = new GridBagConstraints();
+		gbc_spinnerConnectionTimeout.anchor = GridBagConstraints.WEST;
+		gbc_spinnerConnectionTimeout.insets = new Insets(0, 0, 5, 5);
+		gbc_spinnerConnectionTimeout.gridx = 2;
+		gbc_spinnerConnectionTimeout.gridy = 4;
+		add(spinnerConnectionTimeout, gbc_spinnerConnectionTimeout);
+		spinnerModelConnectionTimeout= new SpinnerNumberModel();
+		spinnerModelConnectionTimeout.setMaximum(MAX_CONNECTION_TIMEOUT);
+		spinnerModelConnectionTimeout.setMinimum(MIN_CONNECTION_TIMEOUT);
+		spinnerModelConnectionTimeout.setStepSize(100);
+		spinnerConnectionTimeout.setModel(spinnerModelConnectionTimeout);
 		
 		JLabel lblReadTimeout = new JLabel("读取超时:");
 		GridBagConstraints gbc_lblReadTimeout = new GridBagConstraints();
@@ -122,15 +133,20 @@ public class SettingsPanel extends JPanel {
 		gbc_lblReadTimeout.gridy = 5;
 		add(lblReadTimeout, gbc_lblReadTimeout);
 		
-		textFieldReadTimeout = new JTextField();
-		textFieldReadTimeout.setToolTipText("设置读取服务读取超时时间，单位为毫秒");
-		textFieldReadTimeout.setColumns(10);
-		GridBagConstraints gbc_textFieldReadTimeout = new GridBagConstraints();
-		gbc_textFieldReadTimeout.insets = new Insets(0, 0, 5, 5);
-		gbc_textFieldReadTimeout.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textFieldReadTimeout.gridx = 2;
-		gbc_textFieldReadTimeout.gridy = 5;
-		add(textFieldReadTimeout, gbc_textFieldReadTimeout);
+		JSpinner spinnerReadTimeout = new JSpinner();
+		spinnerReadTimeout.setToolTipText("设置读取超时时间，单位毫秒");
+		spinnerReadTimeout.setPreferredSize(new Dimension(100,30));
+		GridBagConstraints gbc_spinnerReadTimeout = new GridBagConstraints();
+		gbc_spinnerReadTimeout.anchor = GridBagConstraints.WEST;
+		gbc_spinnerReadTimeout.insets = new Insets(0, 0, 5, 5);
+		gbc_spinnerReadTimeout.gridx = 2;
+		gbc_spinnerReadTimeout.gridy = 5;
+		add(spinnerReadTimeout, gbc_spinnerReadTimeout);
+		spinnerModelReadTimeout = new SpinnerNumberModel();
+		spinnerModelReadTimeout.setMaximum(MAX_READ_TIMEOUT);
+		spinnerModelReadTimeout.setMinimum(MIN_READ_TIMEOUT);
+		spinnerModelReadTimeout.setStepSize(100);
+		spinnerReadTimeout.setModel(spinnerModelReadTimeout);
 		
 		JLabel lblThreads = new JLabel("线程数:");
 		GridBagConstraints gbc_lblThreads = new GridBagConstraints();
@@ -140,7 +156,7 @@ public class SettingsPanel extends JPanel {
 		gbc_lblThreads.gridy = 6;
 		add(lblThreads, gbc_lblThreads);
 		
-		spinnerThreads = new JSpinner();
+		JSpinner spinnerThreads = new JSpinner();
 		spinnerThreads.setToolTipText("设置导出文章时开启的线程数");
 		spinnerThreads.setPreferredSize(new Dimension(100,30));
 		GridBagConstraints gbc_spinnerThreads = new GridBagConstraints();
@@ -149,6 +165,10 @@ public class SettingsPanel extends JPanel {
 		gbc_spinnerThreads.gridx = 2;
 		gbc_spinnerThreads.gridy = 6;
 		add(spinnerThreads, gbc_spinnerThreads);
+		spinnerModelThread = new SpinnerNumberModel();
+		spinnerModelThread.setMaximum(MAX_THREADS);
+		spinnerModelThread.setMinimum(MIN_THREADS);
+		spinnerThreads.setModel(spinnerModelThread);
 		
 		JLabel lblMarkdown = new JLabel("markdown :");
 		GridBagConstraints gbc_lblMarkdown = new GridBagConstraints();
@@ -232,9 +252,19 @@ public class SettingsPanel extends JPanel {
 	}
 	
 	private void init() {
-		textFieldUserAgent.setText(GeneralConfig.userAgent);
-		textFieldConnectionTimeout.setText(GeneralConfig.connectionTimeout+"");
-		textFieldReadTimeout.setText(GeneralConfig.readTimeout+"");
+		for (String lookAndFeel : UIOptions.getInstance().getLookAndFeelNames()) {
+			comboBoxTheme.addItem(lookAndFeel);
+		}
+		comboBoxTheme.setSelectedItem(UIConfig.lookAndFeel);
+		for (String userAgent: UserAgentsRegister.names()) {
+			comboBoxUA.addItem(userAgent);
+		}
+		comboBoxUA.setSelectedItem(GeneralConfig.userAgent);
+		
+		spinnerModelConnectionTimeout.setValue(GeneralConfig.connectionTimeout);
+		spinnerModelReadTimeout.setValue(GeneralConfig.readTimeout);
+		spinnerModelThread.setValue(GeneralConfig.threads);
+		
 		textFieldCssPath.setText(GeneralConfig.cssPath);
 		textFieldJsPath.setText(GeneralConfig.jsPath);
 		textFieldMediaPath.setText(GeneralConfig.mediaPath);
@@ -242,18 +272,9 @@ public class SettingsPanel extends JPanel {
 		for (Markdown markdown: Markdown.values()) {
 			comboBoxMarkdown.addItem(markdown.name());
 		}
-		comboBoxMarkdown.setSelectedItem(GeneralConfig.markdown);
+		comboBoxMarkdown.setSelectedItem(GeneralConfig.markdown.toString());
 		
-		spinnerModelThread = new SpinnerNumberModel();
-		spinnerModelThread.setMaximum(10);
-		spinnerModelThread.setMinimum(1);
-		spinnerModelThread.setValue(GeneralConfig.threads);
-		spinnerThreads.setModel(spinnerModelThread);
 		
-		for (String lookAndFeel : UIOptions.getInstance().getLookAndFeelNames()) {
-			comboBoxTheme.addItem(lookAndFeel);
-		}
-		comboBoxTheme.setSelectedItem(UIConfig.lookAndFeel);
 		btnSettingOk.addActionListener(new SaveSettingHandler());
 	}
 	
@@ -261,35 +282,68 @@ public class SettingsPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String userAgent = textFieldUserAgent.getText();
-			
-			int connectionTimeout = 0;
-			String connectionTimeoutText = textFieldConnectionTimeout.getText();
-			if (StringUtils.isNumeric(connectionTimeoutText)) {
-				connectionTimeout = Integer.valueOf(connectionTimeoutText);
-			}
-			
-			int readTimeout = 0;
-			String readTimeoutText = textFieldReadTimeout.getText();
-			if (StringUtils.isNumeric(readTimeoutText)) {
-				readTimeout = Integer.valueOf(readTimeoutText);
-			}
-			
-			String cssPath = textFieldCssPath.getText();
-			String jsPath = textFieldJsPath.getText();
-			String mediaPath = textFieldMediaPath.getText();
-			
-			GeneralConfig.threads = (Integer)spinnerModelThread.getNumber();
+			boolean isChanged = false;
+			String oldValue = UIConfig.lookAndFeel;
 			UIConfig.lookAndFeel = (String)comboBoxTheme.getSelectedItem();
-			String lookAndFeelName = UIOptions.getInstance().getLookAndFeel(UIConfig.lookAndFeel);
-			try {  
-                UIManager.setLookAndFeel(lookAndFeelName);  
-	            SwingUtilities.updateComponentTreeUI(MainFrame.getInstance()); 
-            } catch (Exception e1) {  
-            	LogUtil.log().error(e1.getMessage());
-            }  
+			if (!oldValue.equals(UIConfig.lookAndFeel)) {
+				String lookAndFeelName = UIOptions.getInstance().getLookAndFeel(UIConfig.lookAndFeel);
+				try {  
+	                UIManager.setLookAndFeel(lookAndFeelName);  
+		            SwingUtilities.updateComponentTreeUI(MainFrame.getInstance()); 
+	            } catch (Exception e1) {  
+	            	LogUtil.log().error(e1.getMessage());
+	            }  
+				isChanged = true;
+			}
 			
-			String markdown = (String)comboBoxMarkdown.getSelectedItem();
+			oldValue = GeneralConfig.userAgent;
+			GeneralConfig.userAgent = (String)comboBoxUA.getSelectedItem();
+			if (!oldValue.equals(GeneralConfig.userAgent)) {
+				isChanged = true;
+			}
+			
+			int oldIntValue = GeneralConfig.connectionTimeout;
+			GeneralConfig.connectionTimeout = (Integer)spinnerModelConnectionTimeout.getValue();
+			if (oldIntValue != GeneralConfig.connectionTimeout) {
+				isChanged = true;
+			}
+			oldIntValue = GeneralConfig.readTimeout;
+			GeneralConfig.readTimeout = (Integer)spinnerModelReadTimeout.getValue();
+			if (oldIntValue != GeneralConfig.readTimeout) {
+				isChanged = true;
+			}
+			oldIntValue = GeneralConfig.threads;
+			GeneralConfig.threads = (Integer)spinnerModelThread.getNumber();
+			if (oldIntValue != GeneralConfig.threads) {
+				isChanged = true;
+			}
+			
+			oldValue = GeneralConfig.cssPath;
+			GeneralConfig.cssPath = IOUtil.cleanInvalidFileName(textFieldCssPath.getText());
+			if (!oldValue.equals(GeneralConfig.cssPath)) {
+				isChanged = true;
+			}
+			oldValue = GeneralConfig.jsPath;
+			GeneralConfig.jsPath = IOUtil.cleanInvalidFileName(textFieldJsPath.getText());
+			if (!oldValue.equals(GeneralConfig.jsPath)) {
+				isChanged = true;
+			}
+			oldValue = GeneralConfig.mediaPath;
+			GeneralConfig.mediaPath = IOUtil.cleanInvalidFileName(textFieldMediaPath.getText());
+			if (!oldValue.equals(GeneralConfig.mediaPath)) {
+				isChanged = true;
+			}
+			
+			Markdown markdown = GeneralConfig.markdown;
+			GeneralConfig.markdown = Markdown.valueOf((String)comboBoxMarkdown.getSelectedItem());
+			if (markdown != GeneralConfig.markdown) {
+				isChanged = true;
+			}
+			
+			if (isChanged) {
+				Config[] configs = {GeneralConfig.getInstance(), UIConfig.getInstance()};
+				ConfigUtil.saveConfig(configs);
+			}
 		}
 
 	}

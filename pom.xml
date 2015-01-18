@@ -102,6 +102,12 @@
 			<groupId>de.sciss</groupId>
 			<artifactId>weblaf-core</artifactId>
 			<version>1.28</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-simple</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>de.sciss</groupId>

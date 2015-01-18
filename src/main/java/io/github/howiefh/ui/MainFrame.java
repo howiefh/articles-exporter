@@ -4,6 +4,7 @@ import io.github.howiefh.conf.Config;
 import io.github.howiefh.conf.GeneralConfig;
 import io.github.howiefh.export.ArticleExporterCli;
 import io.github.howiefh.ui.conf.UIConfig;
+import io.github.howiefh.util.IOUtil;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -54,8 +55,9 @@ public class MainFrame extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, WIDTH, HEIGHT);
 		setTitle("文章导出工具");
+		
 		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(2, 2, 3, 3));
+		contentPane.setBorder(new EmptyBorder(5, 0, 0, 0));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 		
@@ -63,10 +65,13 @@ public class MainFrame extends JFrame {
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
 		
 		ArticlesListExporterPanel panel = new ArticlesListExporterPanel();
-		tabbedPane.addTab("导出文章列表", null, panel, null);
+		tabbedPane.addTab("导出文章列表", IOUtil.loadIcon("export.png"), panel, "导出文章列表中的文章到本地");
 		
 		SettingsPanel settingsPanel = new SettingsPanel();
-		tabbedPane.addTab("设置", null, settingsPanel, null);
+		tabbedPane.addTab("设置", IOUtil.loadIcon("settings.png"), settingsPanel, "设置");
+		
+		StatusBarPanel statusBar = new StatusBarPanel();
+		contentPane.add(statusBar, BorderLayout.SOUTH);
 	}
 	public static MainFrame getInstance() {
 		if (instance==null) {

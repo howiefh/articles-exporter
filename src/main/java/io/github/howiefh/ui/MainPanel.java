@@ -7,10 +7,6 @@ import javax.swing.JPanel;
 
 import java.awt.GridBagLayout;
 
-import javax.swing.border.LineBorder;
-
-import java.awt.Color;
-
 import javax.swing.JLabel;
 
 import java.awt.GridBagConstraints;
@@ -34,7 +30,6 @@ public class MainPanel extends JPanel {
 	 * Create the panel.
 	 */
 	public MainPanel() {
-		setBorder(new LineBorder(new Color(0, 0, 0)));
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0};
@@ -44,7 +39,7 @@ public class MainPanel extends JPanel {
 		
 		JLabel lblOutType = new JLabel("导出类型:");
 		GridBagConstraints gbc_lblOutType = new GridBagConstraints();
-		gbc_lblOutType.insets = new Insets(0, 0, 5, 5);
+		gbc_lblOutType.insets = new Insets(0, 5, 5, 5);
 		gbc_lblOutType.gridx = 0;
 		gbc_lblOutType.gridy = 0;
 		add(lblOutType, gbc_lblOutType);
@@ -101,7 +96,7 @@ public class MainPanel extends JPanel {
 		JLabel lblOutDir = new JLabel("导出目录:");
 		GridBagConstraints gbc_lblOutDir = new GridBagConstraints();
 		gbc_lblOutDir.anchor = GridBagConstraints.EAST;
-		gbc_lblOutDir.insets = new Insets(0, 0, 5, 5);
+		gbc_lblOutDir.insets = new Insets(0, 5, 5, 5);
 		gbc_lblOutDir.gridx = 0;
 		gbc_lblOutDir.gridy = 1;
 		add(lblOutDir, gbc_lblOutDir);
@@ -132,14 +127,14 @@ public class MainPanel extends JPanel {
 		gbc_btnExport.gridx = 7;
 		gbc_btnExport.gridy = 1;
 		add(btnExport, gbc_btnExport);
+		
 		JCheckBoxHeaderTable scrollTablePane = new JCheckBoxHeaderTable(columnNames, data);
 		GridBagConstraints gbc_scrollTablePane = new GridBagConstraints();
-		gbc_scrollTablePane.insets = new Insets(0, 0, 0, 5);
+		gbc_scrollTablePane.insets = new Insets(0, 5, 0, 5);
 		gbc_scrollTablePane.gridwidth = 9;
 		gbc_scrollTablePane.fill = GridBagConstraints.BOTH;
 		gbc_scrollTablePane.gridx = 0;
 		gbc_scrollTablePane.gridy = 2;
 		add(scrollTablePane, gbc_scrollTablePane);
-
 	}
 }

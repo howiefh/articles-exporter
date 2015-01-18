@@ -5,6 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.ImageIcon;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -97,4 +101,48 @@ public class IOUtil {
 		}
 	}
 	
+	 /**
+     * icons cache.
+     */
+    private static final Map<String, ImageIcon> iconsCache = new HashMap<String, ImageIcon> ();
+
+    /**
+     * 返回从icons下加载的icon图标
+     *
+     * @param path icon在icons中的路径 
+     * @return 加载的icon
+     */
+    public static ImageIcon loadIcon ( final String path )
+    {
+        return loadIcon ( IOUtil.class, path );
+    }
+
+    /**
+     * 返回从icons下加载的icon图标
+     * @param <T>
+     *
+     * @param nearClass class
+     * @param path icon在icons中的路径 
+     * @return 加载的icon
+     */
+    public static <T> ImageIcon loadIcon ( final Class<T> nearClass, final String path )
+    {
+        final String key = nearClass.getCanonicalName () + ":" + path;
+        if ( !iconsCache.containsKey ( key ) )
+        {
+            iconsCache.put ( key, new ImageIcon ( nearClass.getResource ( "/icons/" + path ) ) );
+        }
+        return iconsCache.get ( key );
+    }
+
+    /**
+     * 返回resources目录下资源的url
+     *
+     * @param path resources目录下资源文件的路径 
+     * @return 资源文件的url
+     */
+    public static URL getResource ( final String path )
+    {
+        return IOUtil.class.getResource ( "/resources/" + path );
+    }
 }

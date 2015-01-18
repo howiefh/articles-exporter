@@ -1,5 +1,7 @@
 package io.github.howiefh.ui;
 
+import io.github.howiefh.conf.UserAgentsRegister;
+
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -74,7 +76,13 @@ public class MainFrameTest {
             }
         }
     }
+    
     private static void createAndShowGUI() {
+    	UserAgentsRegister.register("PC", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/39.0.2171.65 Chrome/39.0.2171.65 Safari/537.36");
+		UserAgentsRegister.register("Android", "Mozilla/5.0 (Linux; U; Android 4.1.1; zh-cn; MI 2 Build/JRO03L) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Mobile Safari/537.36 XiaoMi/MiuiBrowser/2.1.1");
+		UserAgentsRegister.register("UC", "Mozilla/5.0 (Linux; U; Android 4.1.1; zh-CN; MI 2 Build/JRO03L) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 UCBrowser/10.0.0.488 U3/0.8.0 Mobile Safari/534.30");
+		UserAgentsRegister.register("iPhone", "mozilla/5.0 (iphone; cpu iphone os 7_0_2 like mac os x) applewebkit/537.51.1 (khtml, like gecko) version/7.0 mobile/11a501 safari/9537.53");
+
         //Set the look and feel.
         initLookAndFeel();
 

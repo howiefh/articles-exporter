@@ -58,7 +58,7 @@ public class ArticleExporterCli {
 		try {
 			Config[] configs = {GeneralConfig.getInstance()};
 			initConfig(configs);
-			initParsers();
+			initRegisters();
 			if (initOptions(args)) {
 				articleList();
 				deleteTemp();
@@ -71,11 +71,11 @@ public class ArticleExporterCli {
 	}
 
 	public static void initConfig(Config[] configs) {
-		ConfigLoader.loadConfig(configs);
+		ConfigUtil.loadConfig(configs);
 		PropertiesHelper.load();
 	}
 	
-	private static void initParsers() {
+	private static void initRegisters() {
 		RendererRegister.register("html", HtmlRendererImpl.getInstance(),false);
 		((MarkdownRendererImpl)MarkdownRendererImpl.getInstance()).setMarkdown(GeneralConfig.markdown);
 		RendererRegister.register("md", MarkdownRendererImpl.getInstance(),false);
@@ -84,6 +84,11 @@ public class ArticleExporterCli {
 		RendererRegister.register("shtml", HtmlRendererImpl.getInstance());
 		RendererRegister.register("smd", MarkdownRendererImpl.getInstance());
 		RendererRegister.register("stext", TextRendererImpl.getInstance());
+		
+		UserAgentsRegister.register("PC", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/39.0.2171.65 Chrome/39.0.2171.65 Safari/537.36");
+		UserAgentsRegister.register("Android", "Mozilla/5.0 (Linux; U; Android 4.1.1; zh-cn; MI 2 Build/JRO03L) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Mobile Safari/537.36 XiaoMi/MiuiBrowser/2.1.1");
+		UserAgentsRegister.register("UC", "Mozilla/5.0 (Linux; U; Android 4.1.1; zh-CN; MI 2 Build/JRO03L) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 UCBrowser/10.0.0.488 U3/0.8.0 Mobile Safari/534.30");
+		UserAgentsRegister.register("iPhone", "mozilla/5.0 (iphone; cpu iphone os 7_0_2 like mac os x) applewebkit/537.51.1 (khtml, like gecko) version/7.0 mobile/11a501 safari/9537.53");
 	}
 
 	private static boolean initOptions(String[] args) {
@@ -258,6 +263,7 @@ public class ArticleExporterCli {
 			preProcesser.setCssPath(GeneralConfig.cssPath);
 			preProcesser.setJsPath(GeneralConfig.jsPath);
 			preProcesser.setTempPath(tempDir.getAbsolutePath());;
+			preProcesser.setUserAgent(UserAgentsRegister.getUserAgent(GeneralConfig.userAgent));
 			return preProcesser.process(htmlLink);
 		} catch (Exception e) {
 			LogUtil.log().error("文档预处理失败."+e.getMessage());

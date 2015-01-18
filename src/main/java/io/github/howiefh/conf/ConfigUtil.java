@@ -5,7 +5,7 @@ import io.github.howiefh.util.XmlUtil;
 
 import java.io.FileNotFoundException;
 
-public class ConfigLoader {
+public class ConfigUtil {
 	private static final String CONFIG_PATH = "config.xml";
 	
 	private static boolean isLoadConfOK;
@@ -28,12 +28,12 @@ public class ConfigLoader {
 		}
 		//加载配置文件失败,由程序自己初始化参数
 		if (!isLoadConfOK) {
-			initConfig(configs);
+			saveConfig(configs);
 		}
 		return isLoadConfOK;
 	}
 	
-	private static void initConfig(Config[] configs) {
+	public static void saveConfig(Config[] configs) {
 		try {
 			for (Config config : configs) {
 				xmlUtil = new XmlUtil(CONFIG_PATH, true);

@@ -17,7 +17,7 @@ public class GeneralConfig extends Config{
 	 * 软件版本号
 	 */
 	public static String version="1.0";
-	public static String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/39.0.2171.65 Chrome/39.0.2171.65 Safari/537.36";
+	public static String userAgent = "PC";
 	public static int readTimeout = 10 * 1000;
 	public static int connectionTimeout = 10 * 1000;
 	public static String cssPath = "css/";
