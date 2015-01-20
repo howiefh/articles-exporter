@@ -206,24 +206,32 @@ public class MainPanel extends JPanel {
 			if (links==null) {
 				return;
 			}
-			GeneralOptions.getInstance().setOutDir(textFieldOutDir.getText());
-			List<RendererTuple> rendererTuples = new ArrayList<RendererTuple>();
-			for (String renderer : checkBoxs.keySet()) {
-				if (checkBoxs.get(renderer).isSelected()) {
-					rendererTuples.add(RendererRegister.getRendererTuple(renderer));
+			new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					btnExport.setEnabled(false);
+					GeneralOptions.getInstance().setOutDir(textFieldOutDir.getText());
+					List<RendererTuple> rendererTuples = new ArrayList<RendererTuple>();
+					for (String renderer : checkBoxs.keySet()) {
+						if (checkBoxs.get(renderer).isSelected()) {
+							rendererTuples.add(RendererRegister.getRendererTuple(renderer));
+						}
+					}
+					GeneralOptions.getInstance().setRendererTuples(rendererTuples);
+					
+					List<HtmlLink> newLinks = new ArrayList<HtmlLink>();
+					Object[] isSelected = scrollTablePane.getColumnData(0);
+					for (int i = 0; i < isSelected.length; i++) {
+						if ((Boolean)isSelected[i]) {
+							newLinks.add(links.get(i));
+						}
+					}
+					ArticleExporter articleExporter = new ArticleExporter();
+					articleExporter.process(newLinks);
+					btnExport.setEnabled(true);
 				}
-			}
-			GeneralOptions.getInstance().setRendererTuples(rendererTuples);
-			
-			List<HtmlLink> newLinks = new ArrayList<HtmlLink>();
-			Object[] isSelected = scrollTablePane.getColumnData(0);
-			for (int i = 0; i < isSelected.length; i++) {
-				if ((Boolean)isSelected[i]) {
-					newLinks.add(links.get(i));
-				}
-			}
-			ArticleExporter articleExporter = new ArticleExporter();
-			articleExporter.process(newLinks);
+			}).start();
 		}
 		
 	}

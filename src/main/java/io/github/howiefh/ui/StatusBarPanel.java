@@ -1,10 +1,12 @@
 package io.github.howiefh.ui;
 
 import io.github.howiefh.export.Message;
+import io.github.howiefh.ui.label.FreeLinkLabel;
 import io.github.howiefh.ui.statusbar.FreeGCButton;
 import io.github.howiefh.ui.statusbar.FreeMemoryBar;
 import io.github.howiefh.ui.statusbar.FreeStatusMessageLabel;
 import io.github.howiefh.ui.statusbar.FreeStatusTimeLabel;
+import io.github.howiefh.util.LogUtil;
 
 import javax.swing.JPanel;
 import javax.swing.border.MatteBorder;
@@ -17,6 +19,8 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Color;
 import java.awt.Insets;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class StatusBarPanel extends JPanel  implements Message{
 
@@ -30,15 +34,16 @@ public class StatusBarPanel extends JPanel  implements Message{
 	private FreeMemoryBar memoryBar;
 	private FreeGCButton gcButton;
 	private FreeStatusTimeLabel timeLabel;
+	private FreeLinkLabel linkLabel;
 
 	/**
 	 * Create the panel.
 	 */
 	public StatusBarPanel() {
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0, 0, 0 };
+		gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0, 0, 0, 0};
 		gridBagLayout.rowHeights = new int[] { 0, 0 };
-		gridBagLayout.columnWeights = new double[] { 1.0, 0.0, 0.0, 0.0, 0.0,
+		gridBagLayout.columnWeights = new double[] { 1.0, 0.0, 0.0, 0.0, 0.0,0.0,
 				Double.MIN_VALUE };
 		gridBagLayout.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
 		setLayout(gridBagLayout);
@@ -72,6 +77,17 @@ public class StatusBarPanel extends JPanel  implements Message{
 		gbc_timeLabel.gridy = 0;
 		add(timeLabel, gbc_timeLabel);
 
+		try {
+			linkLabel = new FreeLinkLabel("v1.0", new URI("http://github.com/howiefh/articles-exporter"));
+		} catch (URISyntaxException e) {
+			LogUtil.log().error(e.getMessage());
+		}
+		GridBagConstraints gbc_linkLabel = new GridBagConstraints();
+		gbc_linkLabel.insets = new Insets(5, 0, 5, 5);
+		gbc_linkLabel.gridx = 5;
+		gbc_linkLabel.gridy = 0;
+		add(linkLabel, gbc_linkLabel);
+		
 		setPreferredSize(new Dimension(200, 33));
 		setBorder(new MatteBorder(1, 0, 0, 0, (Color) new Color(100, 100, 100)));
 	}

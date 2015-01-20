@@ -16,6 +16,10 @@ import java.util.Map;
  */
 public class DemoFrame extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1122224428387320895L;
 	public static void main(String[] args) {
         try {
 			UIManager.setLookAndFeel("com.alee.laf.WebLookAndFeel");
@@ -41,7 +45,6 @@ public class DemoFrame extends JFrame {
 		System.out.println(textField.getCaretPosition());
 		System.out.println(textField.getColumns());
 		System.out.println(textField.getFocusAccelerator());
-		System.out.println(textField.getDefaultLocale());
 		System.out.println(textField.getVisibleRect());
 		System.out.println(textField.getSize());
 		System.out.println(textField.getPreferredSize());
@@ -70,7 +73,12 @@ public class DemoFrame extends JFrame {
                    entry.getKey(), entry.getValue()
            });
         }
-        final JProgressBar bar1 = new JProgressBar() {{
+        final JProgressBar bar1 = new JProgressBar() {/**
+			 * 
+			 */
+			private static final long serialVersionUID = -2496325259076399059L;
+
+		{
             setStringPainted(true);
         }};
         // animator for the progress bar
@@ -89,28 +97,63 @@ public class DemoFrame extends JFrame {
             }
         }).start();
 	    final List<? extends JComponent> components = Arrays.asList(
-                new JButton("Button") {{addActionListener(new ActionListener() {
+                new JButton("Button") {/**
+					 * 
+					 */
+					private static final long serialVersionUID = 2908992015778562830L;
+
+				{addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
                         JOptionPane.showMessageDialog(DemoFrame.this, "OptionPane");
                     }
                 });}},
-			    new JButton("Button named 'primary'") {{setName("primary");}},
-                new JCheckBox("Checkbox") {{setSelected(true);}},
+			    new JButton("Button named 'primary'") {/**
+					 * 
+					 */
+					private static final long serialVersionUID = -8125465547240469281L;
+
+				{setName("primary");}},
+                new JCheckBox("Checkbox") {/**
+					 * 
+					 */
+					private static final long serialVersionUID = -8947594020926886608L;
+
+				{setSelected(true);}},
                 new JColorChooser(),
-                new JComboBox(new String[] {"ComboBox Item 0", "ComboBox Item 1", "ComboBox Item 2"}),
+                new JComboBox<String>(new String[] {"ComboBox Item 0", "ComboBox Item 1", "ComboBox Item 2"}),
                 new JFileChooser("FileChooser"),
-                new JEditorPane() {{setText("EditorPane");}},
+                new JEditorPane() {/**
+					 * 
+					 */
+					private static final long serialVersionUID = 668151271025259895L;
+
+				{setText("EditorPane");}},
                 new JLabel("Label"),
-                new JList(new String[] {"List Item 0", "List Item 1", "List Item 2", "List Item 3"}) {{setSelectedIndex(1);}},
+                new JList<String>(new String[] {"List Item 0", "List Item 1", "List Item 2", "List Item 3"}) {/**
+					 * 
+					 */
+					private static final long serialVersionUID = -2289394040755504295L;
+
+				{setSelectedIndex(1);}},
                 new JPasswordField("PasswordField"),
                 bar1,
-			    new JProgressBar() {{
+			    new JProgressBar() {/**
+					 * 
+					 */
+					private static final long serialVersionUID = -2697442472064218284L;
+
+				{
 			        setIndeterminate(true);
 			        setStringPainted(true);
 			        setString("ProgressBar Indeterminate");
 			    }},
-                new JRadioButton("RadioButton") {{setSelected(true);}},
+                new JRadioButton("RadioButton") {/**
+					 * 
+					 */
+					private static final long serialVersionUID = -737948811273608795L;
+
+				{setSelected(true);}},
                 new JSlider(),
                 new JSpinner(new SpinnerDateModel()),
                 new JScrollPane(new JTable(model)),
@@ -132,8 +175,18 @@ public class DemoFrame extends JFrame {
         panel1.add(textField);
        
         
-	    setJMenuBar(new JMenuBar() {{
-	        add(new JMenu("Menu") {{
+	    setJMenuBar(new JMenuBar() {/**
+			 * 
+			 */
+			private static final long serialVersionUID = -5171859025616364660L;
+
+		{
+	        add(new JMenu("Menu") {/**
+				 * 
+				 */
+				private static final long serialVersionUID = -8472389401317972938L;
+
+			{
 	            add(new JMenuItem("MenuItem"));
 	            addSeparator();
 		        add(new JMenuItem("MenuItem"));

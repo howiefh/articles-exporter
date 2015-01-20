@@ -4,7 +4,7 @@
   <general> 
     <version>1.0</version>  
     <userAgent>PC</userAgent>  
-    <readTimeout>10000</readTimeout>  
+    <readTimeout>15000</readTimeout>  
     <connectionTimeout>10000</connectionTimeout>  
     <cssPath>css</cssPath>  
     <mediaPath>media</mediaPath>  

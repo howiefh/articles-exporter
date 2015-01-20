@@ -32,6 +32,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 public class SettingsPanel extends JPanel {
 
@@ -81,7 +82,7 @@ public class SettingsPanel extends JPanel {
 		add(lblTheme, gbc_lblTheme);
 		
 		comboBoxTheme = new JComboBox<String>();
-		comboBoxTheme.setToolTipText("选择外观");
+		comboBoxTheme.setToolTipText("选择外观,建议选择WebLookAndFeel");
 		GridBagConstraints gbc_comboBoxTheme = new GridBagConstraints();
 		gbc_comboBoxTheme.insets = new Insets(0, 0, 5, 5);
 		gbc_comboBoxTheme.fill = GridBagConstraints.HORIZONTAL;
@@ -287,73 +288,92 @@ public class SettingsPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			boolean isChanged = false;
-			String oldValue = UIConfig.lookAndFeel;
-			UIConfig.lookAndFeel = (String)comboBoxTheme.getSelectedItem();
-			if (!oldValue.equals(UIConfig.lookAndFeel)) {
-				String lookAndFeelName = UIOptions.getInstance().getLookAndFeel(UIConfig.lookAndFeel);
-				try {  
-	                UIManager.setLookAndFeel(lookAndFeelName);  
-		            SwingUtilities.updateComponentTreeUI(MainFrame.getInstance()); 
-	            } catch (Exception e1) {  
-	            	LogUtil.log().error(e1.getMessage());
-	            }  
-				isChanged = true;
-			}
-			
-			oldValue = GeneralConfig.userAgent;
-			GeneralConfig.userAgent = (String)comboBoxUA.getSelectedItem();
-			if (!oldValue.equals(GeneralConfig.userAgent)) {
-				isChanged = true;
-			}
-			
-			int oldIntValue = GeneralConfig.connectionTimeout;
-			GeneralConfig.connectionTimeout = (Integer)spinnerModelConnectionTimeout.getValue();
-			if (oldIntValue != GeneralConfig.connectionTimeout) {
-				isChanged = true;
-			}
-			oldIntValue = GeneralConfig.readTimeout;
-			GeneralConfig.readTimeout = (Integer)spinnerModelReadTimeout.getValue();
-			if (oldIntValue != GeneralConfig.readTimeout) {
-				isChanged = true;
-			}
-			oldIntValue = GeneralConfig.threads;
-			GeneralConfig.threads = (Integer)spinnerModelThread.getNumber();
-			if (oldIntValue != GeneralConfig.threads) {
-				isChanged = true;
-			}
-			
-			oldValue = GeneralConfig.cssPath;
-			GeneralConfig.cssPath = IOUtil.cleanInvalidFileName(textFieldCssPath.getText());
-			if (!oldValue.equals(GeneralConfig.cssPath)) {
-				isChanged = true;
-			}
-			oldValue = GeneralConfig.jsPath;
-			GeneralConfig.jsPath = IOUtil.cleanInvalidFileName(textFieldJsPath.getText());
-			if (!oldValue.equals(GeneralConfig.jsPath)) {
-				isChanged = true;
-			}
-			oldValue = GeneralConfig.mediaPath;
-			GeneralConfig.mediaPath = IOUtil.cleanInvalidFileName(textFieldMediaPath.getText());
-			if (!oldValue.equals(GeneralConfig.mediaPath)) {
-				isChanged = true;
-			}
-			
-			Markdown markdown = GeneralConfig.markdown;
-			GeneralConfig.markdown = Markdown.valueOf((String)comboBoxMarkdown.getSelectedItem());
-			if (markdown != GeneralConfig.markdown) {
-				isChanged = true;
-			}
-			
-			if (isChanged) {
-				Config[] configs = {GeneralConfig.getInstance(), UIConfig.getInstance()};
-				ConfigUtil.saveConfig(configs);
-				message.info("配置已更改");
-			} else {
-				message.info("配置未更改");
-			}
+			new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					settingsChange();
+				}
+			}).start();
 		}
 
+	}
+	
+	private void settingsChange() {
+		boolean isChanged = false;
+		String oldValue = UIConfig.lookAndFeel;
+		UIConfig.lookAndFeel = (String)comboBoxTheme.getSelectedItem();
+		if (!oldValue.equals(UIConfig.lookAndFeel)) {
+			final String lookAndFeelName = UIOptions.getInstance().getLookAndFeel(UIConfig.lookAndFeel);
+			SwingUtilities.invokeLater(new Runnable() {
+				
+				@Override
+				public void run() {
+					try {
+						UIManager.setLookAndFeel(lookAndFeelName);
+					} catch (ClassNotFoundException | InstantiationException
+							| IllegalAccessException
+							| UnsupportedLookAndFeelException e) {
+						LogUtil.log().error(e.getMessage());
+					}
+		            SwingUtilities.updateComponentTreeUI(MainFrame.getInstance()); 
+		            MainFrame.getInstance().updateUI();
+				}
+			});
+			isChanged = true;
+		}
+		
+		oldValue = GeneralConfig.userAgent;
+		GeneralConfig.userAgent = (String)comboBoxUA.getSelectedItem();
+		if (!oldValue.equals(GeneralConfig.userAgent)) {
+			isChanged = true;
+		}
+		
+		int oldIntValue = GeneralConfig.connectionTimeout;
+		GeneralConfig.connectionTimeout = (Integer)spinnerModelConnectionTimeout.getValue();
+		if (oldIntValue != GeneralConfig.connectionTimeout) {
+			isChanged = true;
+		}
+		oldIntValue = GeneralConfig.readTimeout;
+		GeneralConfig.readTimeout = (Integer)spinnerModelReadTimeout.getValue();
+		if (oldIntValue != GeneralConfig.readTimeout) {
+			isChanged = true;
+		}
+		oldIntValue = GeneralConfig.threads;
+		GeneralConfig.threads = (Integer)spinnerModelThread.getNumber();
+		if (oldIntValue != GeneralConfig.threads) {
+			isChanged = true;
+		}
+		
+		oldValue = GeneralConfig.cssPath;
+		GeneralConfig.cssPath = IOUtil.cleanInvalidFileName(textFieldCssPath.getText());
+		if (!oldValue.equals(GeneralConfig.cssPath)) {
+			isChanged = true;
+		}
+		oldValue = GeneralConfig.jsPath;
+		GeneralConfig.jsPath = IOUtil.cleanInvalidFileName(textFieldJsPath.getText());
+		if (!oldValue.equals(GeneralConfig.jsPath)) {
+			isChanged = true;
+		}
+		oldValue = GeneralConfig.mediaPath;
+		GeneralConfig.mediaPath = IOUtil.cleanInvalidFileName(textFieldMediaPath.getText());
+		if (!oldValue.equals(GeneralConfig.mediaPath)) {
+			isChanged = true;
+		}
+		
+		Markdown markdown = GeneralConfig.markdown;
+		GeneralConfig.markdown = Markdown.valueOf((String)comboBoxMarkdown.getSelectedItem());
+		if (markdown != GeneralConfig.markdown) {
+			isChanged = true;
+		}
+		
+		if (isChanged) {
+			Config[] configs = {GeneralConfig.getInstance(), UIConfig.getInstance()};
+			ConfigUtil.saveConfig(configs);
+			message.info("配置已更改");
+		} else {
+			message.info("配置未更改");
+		}
 	}
 
 	public Message getMessage() {

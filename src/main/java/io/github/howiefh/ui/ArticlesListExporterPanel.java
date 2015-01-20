@@ -156,15 +156,24 @@ public class ArticlesListExporterPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			GeneralOptions.getInstance().setArticleListPageLink(textFieldLink.getText());
-			GeneralOptions.getInstance().setStartPage((Integer)startPageNumberModel.getValue());
-			GeneralOptions.getInstance().setPageCount((Integer)pageCountNumberModel.getValue());
-			GeneralOptions.getInstance().setRuleName((String)comboBoxRule.getSelectedItem());
-			try {
-				panel.fillTable(ArticleExporter.articleList());
-			} catch (Exception e1) {
-				LogUtil.log().error(e1.getMessage());
-			}
+			new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					btnArticlesList.setEnabled(false);
+					GeneralOptions.getInstance().setArticleListPageLink(textFieldLink.getText());
+					GeneralOptions.getInstance().setStartPage((Integer)startPageNumberModel.getValue());
+					GeneralOptions.getInstance().setPageCount((Integer)pageCountNumberModel.getValue());
+					GeneralOptions.getInstance().setRuleName((String)comboBoxRule.getSelectedItem());
+					try {
+						panel.fillTable(ArticleExporter.articleList());
+					} catch (Exception e1) {
+						LogUtil.log().error(e1.getMessage());
+					} finally {
+						btnArticlesList.setEnabled(true);
+					}
+				}
+			}).start();
 		}
 		
 	}

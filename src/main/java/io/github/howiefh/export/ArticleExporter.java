@@ -28,7 +28,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 public class ArticleExporter {
-	public static final String BEFORE_HTML= "<!DOCTYPE html>"
+	public final static String BEFORE_HTML= "<!DOCTYPE html>"
 			+ "<html>"
 			+ "<head>"
 			+ "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">"
@@ -38,14 +38,8 @@ public class ArticleExporter {
 			+ "</style>"
 			+ "</head>"
 			+ "<body>";
-	public static final String AFTER_HTML="</body>"
+	public final static String AFTER_HTML="</body>"
 			+ "</html>";
-	private  String encoding  = "UTF-8";
-	private  ExecutorService executor = Executors.newFixedThreadPool(GeneralConfig.threads);
-	private  File tempDir;
-	private  List<HtmlLink> htmlLinks = new ArrayList<HtmlLink>();
-	private  Map<UUID, String> articles = new HashMap<UUID, String>();
-	
 	public final static String HTML = "html";
 	public final static String MARKDOWN = "md";
 	public final static String TEXT = "text";
@@ -53,6 +47,13 @@ public class ArticleExporter {
 	public final static String SINGLE_HTML = "shtml";
 	public final static String SINGLE_MARKDOWN = "smd";
 	public final static String SINGLE_TEXT = "stext";
+	
+	private String encoding  = "UTF-8";
+	private ExecutorService executor = Executors.newFixedThreadPool(GeneralConfig.threads);
+	private File tempDir;
+	private List<HtmlLink> htmlLinks = new ArrayList<HtmlLink>();
+	private List<HtmlLink> errorLinks= new ArrayList<HtmlLink>();
+	private Map<UUID, String> articles = new HashMap<UUID, String>();
 	
 	private static Message message = new DefaultMessage();
 	
@@ -145,8 +146,10 @@ public class ArticleExporter {
 		saveToMultifiles();
 		saveToSingleFileAndCopyResources();
 		long end = new Date().getTime();
-		LogUtil.log().info("任务完成，用时(单位：毫秒) "+(end-start));
-		message.info("任务完成，用时(单位：毫秒) "+(end-start));
+		int error = errorLinks.size();
+		int success = links.size()-error;
+		LogUtil.log().info("任务完成，导出"+success+"篇，"+(error==0?"":error+"篇失败，")+"用时(单位：毫秒) "+(end-start));
+		message.info("任务完成，导出"+success+"篇，"+(error==0?"":error+"篇失败，")+"用时(单位：毫秒) "+(end-start));
 	}
 
 	private  void saveToMultifiles() {
@@ -199,6 +202,9 @@ public class ArticleExporter {
 		} catch (Exception e) {
 			LogUtil.log().error("文档预处理失败."+e.getMessage());
 			message.error("文档预处理失败."+e.getMessage());
+			synchronized (errorLinks) {
+				errorLinks.add(htmlLink);
+			}
 		}
 		return null;
 	}
