@@ -4,6 +4,7 @@ import io.github.howiefh.export.ArticleExporter;
 import io.github.howiefh.util.IOUtil;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -30,9 +31,10 @@ public class MainFrame extends JFrame {
 	private void buildUI() {
 		// 设置窗口属性
 		final int WIDTH = 770;
-		final int HEIGHT = 450;
+		final int HEIGHT = 521;
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, WIDTH, HEIGHT);
+		setMinimumSize(new Dimension(WIDTH, HEIGHT));
 		setTitle("文章导出工具");
 		
 		contentPane = new JPanel();
@@ -67,8 +69,9 @@ public class MainFrame extends JFrame {
 		});
 	}
 	private void effectsOnClosing(){
-		// 人的感光系统能够区分多达每秒48次闪光，设置更新时间20毫秒
-		int milliSecond = 20;
+		setMinimumSize(new Dimension(0, 0));
+		// 人的感光系统能够区分多达每秒48次闪光，设置更新时间10毫秒,windows下20毫秒有些明显抖动，调成10毫秒
+		int milliSecond = 10;
 		// 需要渐进的缩小的次数
 		int count = 450 / milliSecond;
 		int height = getHeight();

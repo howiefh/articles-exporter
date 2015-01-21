@@ -25,6 +25,7 @@ import javax.swing.JTextField;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.JComboBox;
 import javax.swing.JSpinner;
@@ -33,6 +34,8 @@ import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+
+import org.apache.commons.lang3.SystemUtils;
 
 public class SettingsPanel extends JPanel {
 
@@ -301,28 +304,34 @@ public class SettingsPanel extends JPanel {
 	
 	private void settingsChange() {
 		boolean isChanged = false;
+		boolean isLookAndFeelChanged = false;
 		String oldValue = UIConfig.lookAndFeel;
 		UIConfig.lookAndFeel = (String)comboBoxTheme.getSelectedItem();
 		if (!oldValue.equals(UIConfig.lookAndFeel)) {
-			final String lookAndFeelName = UIOptions.getInstance().getLookAndFeel(UIConfig.lookAndFeel);
-			SwingUtilities.invokeLater(new Runnable() {
-				
-				@Override
-				public void run() {
-					try {
-						UIManager.setLookAndFeel(lookAndFeelName);
-					} catch (ClassNotFoundException | InstantiationException
-							| IllegalAccessException
-							| UnsupportedLookAndFeelException e) {
-						LogUtil.log().error(e.getMessage());
+			if (SystemUtils.IS_OS_WINDOWS) {
+				isLookAndFeelChanged = true;
+			} else {
+				final String lookAndFeelName = UIOptions.getInstance().getLookAndFeel(UIConfig.lookAndFeel);
+				SwingUtilities.invokeLater(new Runnable() {
+					
+					@Override
+					public void run() {
+						try {
+							UIManager.setLookAndFeel(lookAndFeelName);
+						} catch (ClassNotFoundException | InstantiationException
+								| IllegalAccessException
+								| UnsupportedLookAndFeelException e) {
+							LogUtil.log().error(e.getMessage());
+						}
+						// 必须先dispose后setvisible，否则updateUI中不能setUndecorated
+						MainFrame.getInstance().dispose();
+						// Windows下，从weblaf切换到其他外观updateUI中setUndecorated会抛异常，现在Windows下采用重启程序的方法
+			            MainFrame.getInstance().updateUI();
+			            SwingUtilities.updateComponentTreeUI(MainFrame.getInstance()); 
+			            MainFrame.getInstance().setVisible(true);
 					}
-					// 必须先dispose后setvisible，否则updateUI中不能setUndecorated
-					MainFrame.getInstance().dispose();
-		            MainFrame.getInstance().updateUI();
-		            SwingUtilities.updateComponentTreeUI(MainFrame.getInstance()); 
-		            MainFrame.getInstance().setVisible(true);
-				}
-			});
+				});
+			}
 			isChanged = true;
 		}
 		
@@ -376,6 +385,17 @@ public class SettingsPanel extends JPanel {
 			message.info("配置已更改");
 		} else {
 			message.info("配置未更改");
+		}
+		
+		if (isLookAndFeelChanged) {
+			//构造进程生成器
+			ProcessBuilder pb = new ProcessBuilder("articles-exporter.exe");
+			try {
+				pb.start();
+			} catch (IOException e) {
+				LogUtil.log().error(e.getMessage());
+			}
+			System.exit(0);
 		}
 	}
 
