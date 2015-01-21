@@ -5,6 +5,7 @@ import io.github.howiefh.conf.GeneralConfig;
 import io.github.howiefh.export.ArticleExporter;
 import io.github.howiefh.ui.conf.UIConfig;
 import io.github.howiefh.ui.conf.UIOptions;
+import io.github.howiefh.util.IOUtil;
 import io.github.howiefh.util.LogUtil;
 
 import javax.swing.JFrame;
@@ -28,6 +29,7 @@ public class MainUI {
         JFrame.setDefaultLookAndFeelDecorated(true);
         
         MainFrame mainFrame = MainFrame.getInstance();
+        mainFrame.setIconImage(IOUtil.loadIcon("icon.png").getImage());
         mainFrame.setVisible(true);
 	}
 }

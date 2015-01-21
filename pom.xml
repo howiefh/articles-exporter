@@ -4,7 +4,7 @@
 
     <groupId>io.github.howiefh</groupId>
     <artifactId>articles-exporter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
 
     <name>articles-exporter</name>

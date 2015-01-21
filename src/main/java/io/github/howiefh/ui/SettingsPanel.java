@@ -131,7 +131,7 @@ public class SettingsPanel extends JPanel {
 		spinnerModelConnectionTimeout.setStepSize(100);
 		spinnerConnectionTimeout.setModel(spinnerModelConnectionTimeout);
 		
-		JLabel lblReadTimeout = new JLabel("读取超时:");
+		JLabel lblReadTimeout = new JLabel("传输超时:");
 		GridBagConstraints gbc_lblReadTimeout = new GridBagConstraints();
 		gbc_lblReadTimeout.anchor = GridBagConstraints.EAST;
 		gbc_lblReadTimeout.insets = new Insets(0, 0, 5, 5);
@@ -140,7 +140,7 @@ public class SettingsPanel extends JPanel {
 		add(lblReadTimeout, gbc_lblReadTimeout);
 		
 		JSpinner spinnerReadTimeout = new JSpinner();
-		spinnerReadTimeout.setToolTipText("设置读取超时时间，单位毫秒");
+		spinnerReadTimeout.setToolTipText("设置传输超时时间，单位毫秒");
 		spinnerReadTimeout.setPreferredSize(new Dimension(100,30));
 		GridBagConstraints gbc_spinnerReadTimeout = new GridBagConstraints();
 		gbc_spinnerReadTimeout.anchor = GridBagConstraints.WEST;
@@ -316,8 +316,11 @@ public class SettingsPanel extends JPanel {
 							| UnsupportedLookAndFeelException e) {
 						LogUtil.log().error(e.getMessage());
 					}
-		            SwingUtilities.updateComponentTreeUI(MainFrame.getInstance()); 
+					// 必须先dispose后setvisible，否则updateUI中不能setUndecorated
+					MainFrame.getInstance().dispose();
 		            MainFrame.getInstance().updateUI();
+		            SwingUtilities.updateComponentTreeUI(MainFrame.getInstance()); 
+		            MainFrame.getInstance().setVisible(true);
 				}
 			});
 			isChanged = true;

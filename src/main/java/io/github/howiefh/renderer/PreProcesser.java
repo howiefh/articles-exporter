@@ -51,7 +51,7 @@ public class PreProcesser {
 	 */
 	public Document newDocumentFromArticleContent(HtmlLink link) throws IOException {
 		try {
-			Document doc = JsoupUtil.get(link.getHref(), userAgent, connectionTimeout);
+			Document doc = JsoupUtil.get(link.getHref(), userAgent, connectionTimeout, readTimeout);
 			Element content = doc.select(selector).first();
 			String html = beforeHTML+content.toString()+afterHTML;
 			Document res = Jsoup.parse(html, doc.baseUri()); 

@@ -1,5 +1,6 @@
 package io.github.howiefh.ui;
 
+import io.github.howiefh.conf.GeneralConfig;
 import io.github.howiefh.export.Message;
 import io.github.howiefh.ui.label.FreeLinkLabel;
 import io.github.howiefh.ui.statusbar.FreeGCButton;
@@ -78,7 +79,7 @@ public class StatusBarPanel extends JPanel  implements Message{
 		add(timeLabel, gbc_timeLabel);
 
 		try {
-			linkLabel = new FreeLinkLabel("v1.0", new URI("http://github.com/howiefh/articles-exporter"));
+			linkLabel = new FreeLinkLabel("v"+GeneralConfig.version, new URI("http://github.com/howiefh/articles-exporter"));
 		} catch (URISyntaxException e) {
 			LogUtil.log().error(e.getMessage());
 		}

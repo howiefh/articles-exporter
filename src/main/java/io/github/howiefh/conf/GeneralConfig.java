@@ -16,7 +16,7 @@ public class GeneralConfig extends Config{
 	/**
 	 * 软件版本号
 	 */
-	public static String version="1.0";
+	public static String version="0.0.1";
 	public static String userAgent = "PC";
 	public static int readTimeout = 10 * 1000;
 	public static int connectionTimeout = 10 * 1000;

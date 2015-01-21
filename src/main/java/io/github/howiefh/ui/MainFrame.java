@@ -90,6 +90,11 @@ public class MainFrame extends JFrame {
 				e1.printStackTrace();
 			}
 		}
+		if (!UIManager.getLookAndFeel().getSupportsWindowDecorations()) {
+			dispose();
+			setUndecorated(true);
+			setVisible(true);	
+		}
 		setBounds(x, y+height/2, width, 0);
 		try {
 			Thread.sleep(100);
@@ -99,13 +104,13 @@ public class MainFrame extends JFrame {
 	}
 	
 	public void updateUI() {
-		if (isDisplayable())
-			dispose();
-		setUndecorated(UIManager.getLookAndFeel().getSupportsWindowDecorations());
 		JRootPane jRootPane = getRootPane();
-		jRootPane.setWindowDecorationStyle(jRootPane.getWindowDecorationStyle());
-		if (!isDisplayable())
-			setVisible(true);	
+		//没有这句,有窗体装饰的变为没有窗体装饰(如Nimbus变成Metal)时，会没有装饰，标题栏不显示
+		jRootPane.setWindowDecorationStyle(JRootPane.FRAME);
+		//没有这句,有窗体装饰的变为没有窗体装饰(如Nimbus变成Metal)时，会有装饰，会有两个标题栏，一个系统自带，一个是laf的。
+		//没有这句,没有窗体装饰的变为有窗体装饰(如Metal变成Nimbus)时，会没有装饰，标题栏不显示
+		//这句使用laf支持窗体窗体装饰来设置frame的窗体装饰，使窗体能使用laf提供的窗体装饰
+		setUndecorated(UIManager.getLookAndFeel().getSupportsWindowDecorations());
 	}
 	public static MainFrame getInstance() {
 		if (instance==null) {

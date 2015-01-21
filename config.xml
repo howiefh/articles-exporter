@@ -2,7 +2,7 @@
 
 <settings> 
   <general> 
-    <version>1.0</version>  
+    <version>0.0.1</version>  
     <userAgent>PC</userAgent>  
     <readTimeout>15000</readTimeout>  
     <connectionTimeout>10000</connectionTimeout>  

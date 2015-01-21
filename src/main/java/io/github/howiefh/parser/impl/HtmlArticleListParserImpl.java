@@ -22,6 +22,7 @@ public class HtmlArticleListParserImpl implements ArticleListParser{
 	
 	private String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/39.0.2171.65 Chrome/39.0.2171.65 Safari/537.36";
 	private int connectionTimeout=10*1000;
+	private int readTimeout =10*1000;
 	public HtmlArticleListParserImpl(){
 		
 	}
@@ -58,8 +59,8 @@ public class HtmlArticleListParserImpl implements ArticleListParser{
 	private Document getListPageDocument(int pageIndex) throws IOException{
 		try {
 			String url = GeneralOptions.getInstance().getArticleListPageLink();
-			String newUrl = String.format(url, pageIndex);
-			Document doc = JsoupUtil.get(newUrl, userAgent, connectionTimeout);
+			String newUrl = String.format(url, pageIndex+"");
+			Document doc = JsoupUtil.get(newUrl, userAgent, connectionTimeout, readTimeout);
 			return doc;
 		} catch (IOException e) {
 			LogUtil.log().error(e.getMessage());
@@ -101,6 +102,12 @@ public class HtmlArticleListParserImpl implements ArticleListParser{
 	}
 	public void setConnectionTimeout(int connectionTimeout) {
 		this.connectionTimeout = connectionTimeout;
+	}
+	public int getReadTimeout() {
+		return readTimeout;
+	}
+	public void setReadTimeout(int readTimeout) {
+		this.readTimeout = readTimeout;
 	}
 	
 }

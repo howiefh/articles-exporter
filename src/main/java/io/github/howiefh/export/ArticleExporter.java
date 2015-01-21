@@ -113,6 +113,9 @@ public class ArticleExporter {
 					GeneralOptions.getInstance().getPageCount(),
 					PropertiesHelper.getListTitleSelector()
 					);
+			htmlArticleListParserImpl.setConnectionTimeout(GeneralConfig.connectionTimeout);
+			htmlArticleListParserImpl.setReadTimeout(GeneralConfig.readTimeout);
+			htmlArticleListParserImpl.setUserAgent(GeneralConfig.userAgent);
 			message.info("获取文章列表...");
 			List<HtmlLink> links = htmlArticleListParserImpl.articleLinkList();
 			message.info("共计"+links.size()+"篇文章");
@@ -148,8 +151,8 @@ public class ArticleExporter {
 		long end = new Date().getTime();
 		int error = errorLinks.size();
 		int success = links.size()-error;
-		LogUtil.log().info("任务完成，导出"+success+"篇，"+(error==0?"":error+"篇失败，")+"用时(单位：毫秒) "+(end-start));
-		message.info("任务完成，导出"+success+"篇，"+(error==0?"":error+"篇失败，")+"用时(单位：毫秒) "+(end-start));
+		LogUtil.log().info("任务完成，导出"+success+"篇，"+(error==0?"":error+"篇失败，")+"用时："+(end-start)+"毫秒");
+		message.info("任务完成，导出"+success+"篇，"+(error==0?"":error+"篇失败，")+"用时："+(end-start)+"毫秒");
 	}
 
 	private  void saveToMultifiles() {
