@@ -68,7 +68,7 @@ public class PDFRendererImpl implements Renderer{
 		return doc.toString();
 	}
 	@Override
-	public void write(String filepath,Document doc, String encoding) {
+	public void write(String filepath,Document doc, String encoding) throws Exception{
 		try {
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance()
 					.newDocumentBuilder();
@@ -89,18 +89,9 @@ public class PDFRendererImpl implements Renderer{
 	  
 	        os.flush();  
 	        os.close();  
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException | DocumentException | SAXException | ParserConfigurationException e) {
 			LogUtil.log().error(e.getMessage());
-		} catch (DocumentException e) {
-			e.printStackTrace();
-			LogUtil.log().error(e.getMessage());
-		} catch (SAXException e) {
-			e.printStackTrace();
-			LogUtil.log().error(e.getMessage());
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-			LogUtil.log().error(e.getMessage());
+			throw e;
 		}
 	}
 	

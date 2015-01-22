@@ -47,6 +47,7 @@ public class ArticleExporter {
 	public final static String SINGLE_HTML = "shtml";
 	public final static String SINGLE_MARKDOWN = "smd";
 	public final static String SINGLE_TEXT = "stext";
+	public final static String SINGLE_FILE_NAME = "out";
 	
 	private String encoding  = "UTF-8";
 	private ExecutorService executor = Executors.newFixedThreadPool(GeneralConfig.threads);
@@ -56,7 +57,17 @@ public class ArticleExporter {
 	private Map<UUID, String> articles = new HashMap<UUID, String>();
 	
 	private static Message message = new DefaultMessage();
+	private static Result result = new DefaultResult();
 	
+	private static class DefaultResult implements Result{
+
+		@Override
+		public void result(int index, String msg) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
 	private static class DefaultMessage implements Message{
 
 		@Override
@@ -157,37 +168,51 @@ public class ArticleExporter {
 
 	private  void saveToMultifiles() {
 		//一篇文章导出到一个文件
-		for (HtmlLink htmlLink : htmlLinks) {
-			execute(htmlLink);
+		int len = htmlLinks.size();
+		for (int i = 0; i < len; i++) {
+			execute(htmlLinks.get(i), i);
 		}
 		executor.shutdown();
         while (!executor.isTerminated()) {
         }
 	}
-	private  void execute(final HtmlLink htmlLink) {
+	private  void execute(final HtmlLink htmlLink, final int index) {
 		Runnable runnable = new Runnable() {
 			
 			@Override
 			public void run() {
-				saveToFile(htmlLink);
+				try {
+					saveToFile(htmlLink);
+					result.result(index, "单篇导出成功");
+				} catch (Exception e) {
+					result.result(index, "导出失败");
+				}
 			}
 		};
 		executor.execute(runnable);
 	}
-	private  void saveToFile(HtmlLink htmlLink) {
-		Document doc = preProcess(htmlLink);
-		boolean isSingleFileAdded = false;
-		for (RendererTuple rendererTuple : GeneralOptions.getInstance().getRendererTuples()) {
-			if (rendererTuple.isSingleFile) {
-				if (!isSingleFileAdded) {
-					articles.put(htmlLink.getUuid(), doc.body().html());
-					isSingleFileAdded = true;
-				}
-				continue;
+	private  void saveToFile(HtmlLink htmlLink) throws Exception{
+		try {
+			Document doc = preProcess(htmlLink);
+			if (doc == null) {
+				throw new NullPointerException("预处理失败");
 			}
-			String filePath = FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(),
-					rendererTuple.renderer.path()+IOUtil.cleanInvalidFileName(htmlLink.getContent())+rendererTuple.renderer.postfix());
-			write(rendererTuple.renderer, doc, filePath, encoding);
+			boolean isSingleFileAdded = false;
+			for (RendererTuple rendererTuple : GeneralOptions.getInstance().getRendererTuples()) {
+				if (rendererTuple.isSingleFile) {
+					if (!isSingleFileAdded) {
+						articles.put(htmlLink.getUuid(), doc.body().html());
+						isSingleFileAdded = true;
+					}
+					continue;
+				}
+				String filePath = FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(),
+						rendererTuple.renderer.path()+IOUtil.cleanInvalidFileName(htmlLink.getContent())+rendererTuple.renderer.postfix());
+				write(rendererTuple.renderer, doc, filePath, encoding);
+			}
+		} catch (Exception e) {
+			LogUtil.log().error(e.getMessage());
+			throw e;
 		}
 	}
 	private  Document preProcess(HtmlLink htmlLink) {
@@ -213,38 +238,44 @@ public class ArticleExporter {
 	}
 	private  void saveToSingleFileAndCopyResources() {
 		//后续处理,对生成单文件的生成单文件，拷贝资源文件
+		int size = htmlLinks.size();
 		for (RendererTuple rendererTuple : GeneralOptions.getInstance().getRendererTuples()) {
-			if (rendererTuple.isSingleFile) {
-				String fileName = "out";
-				String filePath = FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(),
-						rendererTuple.renderer.path()+fileName+rendererTuple.renderer.postfix());
-				
-				Element element = articleLinkListDocument(htmlLinks);
-				StringBuilder res = new StringBuilder();
-				res.append(BEFORE_HTML);
-				res.append(element.toString());
-				for (HtmlLink htmlLink : htmlLinks) {
-					res.append(articles.get(htmlLink.getUuid()));
+			try {
+				if (rendererTuple.isSingleFile) {
+					String filePath = FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(),
+							rendererTuple.renderer.path()+SINGLE_FILE_NAME+rendererTuple.renderer.postfix());
+					
+					Element element = articleLinkListDocument(htmlLinks);
+					StringBuilder res = new StringBuilder();
+					res.append(BEFORE_HTML);
+					res.append(element.toString());
+					for (HtmlLink htmlLink : htmlLinks) {
+						res.append(articles.get(htmlLink.getUuid()));
+					}
+					res.append(AFTER_HTML);
+					
+					Document document = Jsoup.parse(res.toString());
+					document.title(SINGLE_FILE_NAME);
+					
+					if (rendererTuple.renderer instanceof PDFRendererImpl) {
+						File pdfBaseURLPath = new File(FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(), GeneralConfig.TEMP_PATH)); 
+						((PDFRendererImpl)rendererTuple.renderer).setBaseURL(pdfBaseURLPath.toURI().toString());
+						document.select("meta").remove();
+						document.head().append(generateBookmark(htmlLinks));
+						write(rendererTuple.renderer, document, filePath, encoding);
+						document.head().prepend("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
+					} else {
+						write(rendererTuple.renderer, document, filePath, encoding);
+					}
+					result.result(size++,rendererTuple.renderer.postfix() + "文件导出成功");
+					continue;
 				}
-				res.append(AFTER_HTML);
-				
-				Document document = Jsoup.parse(res.toString());
-				document.title(fileName);
-				
-				if (rendererTuple.renderer instanceof PDFRendererImpl) {
-					File pdfBaseURLPath = new File(FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(), GeneralConfig.TEMP_PATH)); 
-					((PDFRendererImpl)rendererTuple.renderer).setBaseURL(pdfBaseURLPath.toURI().toString());
-					document.select("meta").remove();
-					document.head().append(generateBookmark(htmlLinks));
-					write(rendererTuple.renderer, document, filePath, encoding);
-					document.head().prepend("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
-				} else {
-					write(rendererTuple.renderer, document, filePath, encoding);
-				}
-				continue;
+				IOUtil.copyDirectory(tempDir.getAbsolutePath(),
+						FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(),rendererTuple.renderer.path()));
+			} catch (Exception e) {
+				LogUtil.log().error(e.getMessage());
+				result.result(size++,rendererTuple.renderer.postfix() + "文件导出失败");
 			}
-			IOUtil.copyDirectory(tempDir.getAbsolutePath(),
-					FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(),rendererTuple.renderer.path()));
 		}
 	}
 	/**
@@ -274,9 +305,14 @@ public class ArticleExporter {
 		return stringBuilder.toString();
 	}
 	private  void write(Renderer renderer, Document document, String filePath, String encoding) {
-		renderer.write(filePath,document, encoding);
-		LogUtil.log().info(filePath);
-		message.info(filePath);
+		try {
+			renderer.write(filePath,document, encoding);
+			LogUtil.log().info(filePath);
+			message.info(filePath);
+		} catch (Exception e) {
+			LogUtil.log().error(e.getMessage());
+			message.error(e.getMessage());
+		}
 	}
 
 	public static Message getMessage() {
@@ -285,5 +321,11 @@ public class ArticleExporter {
 
 	public static void setMessage(Message message) {
 		ArticleExporter.message = message;
+	}
+	public static Result getResult() {
+		return result;
+	}
+	public static void setResult(Result result) {
+		ArticleExporter.result = result;
 	}
 }

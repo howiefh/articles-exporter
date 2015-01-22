@@ -36,12 +36,13 @@ public class TextRendererImpl implements Renderer{
         return formatter.toString();
 	}
 	@Override
-	public void write(String filepath, Document doc, String encoding) {
+	public void write(String filepath, Document doc, String encoding) throws Exception {
 		try {
 			File file = new File(filepath);
 			FileUtils.writeStringToFile(file, parse(doc), encoding);
 		} catch (IOException e) {
 			LogUtil.log().error(e.getMessage());
+			throw e;
 		}
 	}
 

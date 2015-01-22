@@ -5,6 +5,7 @@ import io.github.howiefh.conf.RendererRegister;
 import io.github.howiefh.conf.RendererRegister.RendererTuple;
 import io.github.howiefh.export.ArticleExporter;
 import io.github.howiefh.export.Message;
+import io.github.howiefh.export.Result;
 import io.github.howiefh.renderer.HtmlLink;
 import io.github.howiefh.ui.handle.ChooseFileHandler;
 import io.github.howiefh.ui.table.JCheckBoxHeaderTable;
@@ -31,7 +32,7 @@ import java.util.Map;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 
-public class MainPanel extends JPanel {
+public class MainPanel extends JPanel implements Result{
 
 	/**
 	 * 
@@ -228,6 +229,7 @@ public class MainPanel extends JPanel {
 						}
 					}
 					ArticleExporter articleExporter = new ArticleExporter();
+					ArticleExporter.setResult(MainPanel.this);
 					articleExporter.process(newLinks);
 					btnExport.setEnabled(true);
 				}
@@ -242,5 +244,15 @@ public class MainPanel extends JPanel {
 
 	public void setMessage(Message message) {
 		this.message = message;
+	}
+
+	@Override
+	public void result(int index, String msg) {
+		if (scrollTablePane.getRowCount() > index) {
+			scrollTablePane.setValueAt(msg, index, 2);
+		} else {
+			Object[] objects = {true, ArticleExporter.SINGLE_FILE_NAME, msg};
+			scrollTablePane.addRow(objects);
+		}
 	}
 }

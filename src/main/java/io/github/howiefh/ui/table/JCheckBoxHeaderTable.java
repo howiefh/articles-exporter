@@ -99,6 +99,12 @@ public class JCheckBoxHeaderTable extends JScrollPane{
 		return list.toArray();
 	}
 
+	public int getRowCount(){
+		return dtm.getRowCount();
+	}
+	public int getColumnCount(){
+		return dtm.getColumnCount();
+	}
 	public Object[] getColumnNames() {
 		return columnNames;
 	}

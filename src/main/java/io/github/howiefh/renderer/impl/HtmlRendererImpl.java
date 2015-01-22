@@ -28,12 +28,13 @@ public class HtmlRendererImpl implements Renderer{
 		return doc.toString();
 	}
 	@Override
-	public void write(String filepath,Document doc, String encoding) {
+	public void write(String filepath,Document doc, String encoding) throws Exception{
 		try {
 			File file = new File(filepath);
 			FileUtils.writeStringToFile(file, parse(doc), encoding);
 		} catch (IOException e) {
 			LogUtil.log().error(e.getMessage());
+			throw e;
 		}
 	}
 

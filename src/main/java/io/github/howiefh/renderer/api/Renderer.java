@@ -14,7 +14,7 @@ public interface Renderer {
 	 * @param filepath
 	 * @param doc
 	 */
-	void write(String filepath,Document doc, String encoding);
+	void write(String filepath,Document doc, String encoding) throws Exception;
 	/**
 	 * 对应类型的存放目录
 	 * @return

@@ -4,6 +4,7 @@ import io.github.howiefh.conf.GeneralOptions;
 import io.github.howiefh.conf.PropertiesHelper;
 import io.github.howiefh.export.ArticleExporter;
 import io.github.howiefh.export.Message;
+import io.github.howiefh.ui.textfield.FreeTextField;
 import io.github.howiefh.util.LogUtil;
 
 import javax.swing.JPanel;
@@ -34,7 +35,7 @@ public class ArticlesListExporterPanel extends JPanel {
 	private static final int MAX_PAGE_COUNT = 300;
 	private static final int MIN_PAGE_COUNT = 1;
 	
-	private JTextField textFieldLink;
+	private FreeTextField textFieldLink;
 	private SpinnerNumberModel startPageNumberModel; 
 	private SpinnerNumberModel pageCountNumberModel;
 	private JComboBox<String> comboBoxRule;
@@ -63,7 +64,7 @@ public class ArticlesListExporterPanel extends JPanel {
 		gbc_lblLink.gridy = 0;
 		add(lblLink, gbc_lblLink);
 		
-		textFieldLink = new JTextField();
+		textFieldLink = new FreeTextField();
 		GridBagConstraints gbc_textFieldLink = new GridBagConstraints();
 		gbc_textFieldLink.insets = new Insets(5, 0, 5, 5);
 		gbc_textFieldLink.fill = GridBagConstraints.HORIZONTAL;
