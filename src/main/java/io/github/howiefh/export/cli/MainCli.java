@@ -44,7 +44,7 @@ public class MainCli {
 
 		options.addOption("h", "help", false, "帮助");
 		options.addOption("l", "link", true,
-				"链接，页码使用%d代替，例如：http://example.com/p/%d");
+				"链接，页码使用%s代替，例如：http://example.com/p/%s");
 		options.addOption("r", "rule", true, "规则,位于conf目录下的文件名");
 		options.addOption("s", "start-page", true, "起始页码");
 		options.addOption("c", "page-count", true, "总页数");
