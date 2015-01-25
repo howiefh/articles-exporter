@@ -8,6 +8,7 @@ import io.github.howiefh.export.Message;
 import io.github.howiefh.renderer.Markdown;
 import io.github.howiefh.ui.conf.UIConfig;
 import io.github.howiefh.ui.conf.UIOptions;
+import io.github.howiefh.ui.textfield.FreeTextField;
 import io.github.howiefh.util.IOUtil;
 import io.github.howiefh.util.LogUtil;
 
@@ -19,8 +20,6 @@ import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 
 import java.awt.GridBagConstraints;
-
-import javax.swing.JTextField;
 
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -43,20 +42,15 @@ public class SettingsPanel extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1158432266211992494L;
-	private static final int MAX_THREADS = 10;
-	private static final int MIN_THREADS = 1;
-	private static final int MAX_READ_TIMEOUT = 30000;
-	private static final int MIN_READ_TIMEOUT = 1000;
-	private static final int MAX_CONNECTION_TIMEOUT = 30000;
-	private static final int MIN_CONNECTION_TIMEOUT = 1000;
+
 	
 	private JComboBox<String> comboBoxTheme;
 	private JComboBox<String> comboBoxUA;
 	private SpinnerNumberModel spinnerModelConnectionTimeout; 
 	private SpinnerNumberModel spinnerModelReadTimeout; 
-	private JTextField textFieldCssPath;
-	private JTextField textFieldMediaPath;
-	private JTextField textFieldJsPath;
+	private FreeTextField textFieldCssPath;
+	private FreeTextField textFieldMediaPath;
+	private FreeTextField textFieldJsPath;
 	private SpinnerNumberModel spinnerModelThread; 
 	private JComboBox<String> comboBoxMarkdown;
 	private JButton btnSettingOk;
@@ -129,8 +123,8 @@ public class SettingsPanel extends JPanel {
 		gbc_spinnerConnectionTimeout.gridy = 4;
 		add(spinnerConnectionTimeout, gbc_spinnerConnectionTimeout);
 		spinnerModelConnectionTimeout= new SpinnerNumberModel();
-		spinnerModelConnectionTimeout.setMaximum(MAX_CONNECTION_TIMEOUT);
-		spinnerModelConnectionTimeout.setMinimum(MIN_CONNECTION_TIMEOUT);
+		spinnerModelConnectionTimeout.setMaximum(GeneralConfig.MAX_CONNECTION_TIMEOUT);
+		spinnerModelConnectionTimeout.setMinimum(GeneralConfig.MIN_CONNECTION_TIMEOUT);
 		spinnerModelConnectionTimeout.setStepSize(100);
 		spinnerConnectionTimeout.setModel(spinnerModelConnectionTimeout);
 		
@@ -152,8 +146,8 @@ public class SettingsPanel extends JPanel {
 		gbc_spinnerReadTimeout.gridy = 5;
 		add(spinnerReadTimeout, gbc_spinnerReadTimeout);
 		spinnerModelReadTimeout = new SpinnerNumberModel();
-		spinnerModelReadTimeout.setMaximum(MAX_READ_TIMEOUT);
-		spinnerModelReadTimeout.setMinimum(MIN_READ_TIMEOUT);
+		spinnerModelReadTimeout.setMaximum(GeneralConfig.MAX_READ_TIMEOUT);
+		spinnerModelReadTimeout.setMinimum(GeneralConfig.MIN_READ_TIMEOUT);
 		spinnerModelReadTimeout.setStepSize(100);
 		spinnerReadTimeout.setModel(spinnerModelReadTimeout);
 		
@@ -175,8 +169,8 @@ public class SettingsPanel extends JPanel {
 		gbc_spinnerThreads.gridy = 6;
 		add(spinnerThreads, gbc_spinnerThreads);
 		spinnerModelThread = new SpinnerNumberModel();
-		spinnerModelThread.setMaximum(MAX_THREADS);
-		spinnerModelThread.setMinimum(MIN_THREADS);
+		spinnerModelThread.setMaximum(GeneralConfig.MAX_THREADS);
+		spinnerModelThread.setMinimum(GeneralConfig.MIN_THREADS);
 		spinnerThreads.setModel(spinnerModelThread);
 		
 		JLabel lblMarkdown = new JLabel("markdown :");
@@ -204,7 +198,7 @@ public class SettingsPanel extends JPanel {
 		gbc_lblCssPath.gridy = 8;
 		add(lblCssPath, gbc_lblCssPath);
 		
-		textFieldCssPath = new JTextField();
+		textFieldCssPath = new FreeTextField();
 		textFieldCssPath.setToolTipText("设置导出的css文件存放目录名");
 		textFieldCssPath.setColumns(10);
 		GridBagConstraints gbc_textFieldCssPath = new GridBagConstraints();
@@ -222,7 +216,7 @@ public class SettingsPanel extends JPanel {
 		gbc_lblJspath.gridy = 9;
 		add(lblJspath, gbc_lblJspath);
 		
-		textFieldJsPath = new JTextField();
+		textFieldJsPath = new FreeTextField();
 		textFieldJsPath.setToolTipText("设置导出的javascript文件存放目录名");
 		textFieldJsPath.setColumns(10);
 		GridBagConstraints gbc_textFieldJsPath = new GridBagConstraints();
@@ -240,7 +234,7 @@ public class SettingsPanel extends JPanel {
 		gbc_lblMediaPath.gridy = 10;
 		add(lblMediaPath, gbc_lblMediaPath);
 		
-		textFieldMediaPath = new JTextField();
+		textFieldMediaPath = new FreeTextField();
 		textFieldMediaPath.setToolTipText("设置导出的多媒体文件存放目录名");
 		textFieldMediaPath.setColumns(10);
 		GridBagConstraints gbc_textFieldMediaPath = new GridBagConstraints();

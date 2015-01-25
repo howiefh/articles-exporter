@@ -4,6 +4,7 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -33,12 +34,14 @@ public class FreeLinkLabel extends JLabel{
 			public void mouseEntered(MouseEvent e) {
 				// TODO Auto-generated method stub
 				super.mouseEntered(e);
+				setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 				setForeground(hoverColor);
 			}
 			@Override
 			public void mouseExited(MouseEvent e) {
 				// TODO Auto-generated method stub
 				super.mouseExited(e);
+				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				setForeground(defaultColor);
 			}
 		});

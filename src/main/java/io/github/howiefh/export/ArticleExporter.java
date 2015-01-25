@@ -245,7 +245,7 @@ public class ArticleExporter {
 					String filePath = FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(),
 							rendererTuple.renderer.path()+SINGLE_FILE_NAME+rendererTuple.renderer.postfix());
 					
-					Element element = articleLinkListDocument(htmlLinks);
+					Element element = articleSingleFileLinkList(htmlLinks);
 					StringBuilder res = new StringBuilder();
 					res.append(BEFORE_HTML);
 					res.append(element.toString());
@@ -272,6 +272,12 @@ public class ArticleExporter {
 				}
 				IOUtil.copyDirectory(tempDir.getAbsolutePath(),
 						FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(),rendererTuple.renderer.path()));
+				if (rendererTuple.renderer instanceof HtmlRendererImpl && !rendererTuple.isSingleFile) {
+					rendererTuple.renderer.write(FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(),"toc.html"), articleFrameLinkList(htmlLinks), encoding);
+					File src = new File(IOUtil.getResource("index.tpl").getFile());
+					File dest = new File(FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(),"index.html"));
+					FileUtils.copyFile(src,dest);
+				}
 			} catch (Exception e) {
 				LogUtil.log().error(e.getMessage());
 				result.result(size++,rendererTuple.renderer.postfix() + "文件导出失败");
@@ -283,13 +289,22 @@ public class ArticleExporter {
 	 * @param links
 	 * @return
 	 */
-	public static Element articleLinkListDocument(List<HtmlLink> links) {
+	public static Element articleSingleFileLinkList(List<HtmlLink> links) {
 		Document document = Jsoup.parse("<ol></ol>");
 		Element element = document.select("ol").first();
 		for (HtmlLink htmlLink : links) {
 			element.append("<li><a href='#"+htmlLink.getUuid()+"'>"+htmlLink.getContent()+"</a></li>");
 		}
 		return element;
+	}
+	public static Document articleFrameLinkList(List<HtmlLink> links) {
+		Document document = Jsoup.parse("<ol></ol>");
+		document.head().append("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
+		Element element = document.select("ol").first();
+		for (HtmlLink htmlLink : links) {
+			element.append("<li><a href='html/"+IOUtil.cleanInvalidFileName(htmlLink.getContent())+".html' target='showcontent'>"+htmlLink.getContent()+"</a></li>");
+		}
+		return document;
 	}
 	
 	public static String generateBookmark(List<HtmlLink> links) {

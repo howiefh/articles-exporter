@@ -20,9 +20,9 @@ import org.apache.commons.lang3.SystemUtils;
 
 public class MainUI {
 	public static void main(String[] args) {
+		ArticleExporter.initRegisters();
 		Config[] configs = {GeneralConfig.getInstance(),UIConfig.getInstance()};
 		ArticleExporter.initConfig(configs);
-		ArticleExporter.initRegisters();
         //Set the look and feel.
 		try {
 			UIManager.setLookAndFeel(UIOptions.getInstance().getLookAndFeel(UIConfig.lookAndFeel));

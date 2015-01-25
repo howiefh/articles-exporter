@@ -18,8 +18,6 @@ import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 操作xml工具类
@@ -27,8 +25,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class XmlUtil {
-    private Logger logger = LoggerFactory.getLogger(XmlUtil.class); 
-
 	// XML文件名
 	private String xmlFile;
 	// XML 文档对象
@@ -46,7 +42,7 @@ public class XmlUtil {
 			try {
 				file.createNewFile();
 			} catch (IOException e) {
-				logger.error("创建文件 {} 失败", xmlFile);
+				LogUtil.log().error("创建文件 {} 失败", xmlFile);
 			}
 		}
 		initial(xmlFile);
@@ -64,17 +60,17 @@ public class XmlUtil {
 				document = reader.read(file);
 				root = document.getRootElement();
 				if (root == null) {
-					logger.debug("root is null");
+					LogUtil.log().debug("root is null");
 					root = document.addElement("settings");  
 				} 
 			} else {
 				// 文件不存在
-				logger.error("找不到文件:{}",xmlFile);
+				LogUtil.log().error("找不到文件:{}",xmlFile);
 				throw new FileNotFoundException(String.format("找不到文件:" + xmlFile));
 			}
 		} catch (DocumentException  ex) {
 //			ex.printStackTrace();
-			logger.error("无法读取文件,{}", ex.toString());
+			LogUtil.log().error("无法读取文件,{}", ex.toString());
 			//配置文件为空,主动创建document对象
 	        document = DocumentHelper.createDocument();
 	        root = document.addElement("settings");  //创建根节点
@@ -87,7 +83,7 @@ public class XmlUtil {
 	 */
 	public void update(Config config) {
 		if (config == null) {
-			logger.info("config为空");
+			LogUtil.log().info("config为空");
 			return;
 		}
 		//获取config子元素
@@ -96,7 +92,7 @@ public class XmlUtil {
 		if (element == null) {
 			config.generateNodeUnder(root);
 			saveDocumentToFile();
-			logger.info("原配置中{}为空，新配置已写入:{}",config.getElementName(), config.toString());
+			LogUtil.log().info("原配置中{}为空，新配置已写入:{}",config.getElementName(), config.toString());
 			return;
 		}
 		//删除原来的
@@ -106,7 +102,7 @@ public class XmlUtil {
 		config.generateNodeUnder(root);
 		//保存
 		saveDocumentToFile();
-		logger.info("更新配置文件:{}", config.toString());
+		LogUtil.log().info("更新配置文件:{}", config.toString());
 	}
 	
 	/**
@@ -119,7 +115,7 @@ public class XmlUtil {
         //获得需要修改的节点
         Node node = document.selectSingleNode(xpathExpression);
         if (node == null) {
-			logger.error("没有匹配的xpath:{}", xpathExpression);
+			LogUtil.log().error("没有匹配的xpath:{}", xpathExpression);
 			return false;
 		} else {
 	        //将节点强制转换成元素
@@ -135,7 +131,7 @@ public class XmlUtil {
 		//获取config子元素
 		Element element = root.element(config.getElementName());
         if (element== null) {
-			logger.error("找不到元素:{}", config.getElementName());
+			LogUtil.log().error("找不到元素:{}", config.getElementName());
 			return false;
 		}
         return config.fetchFieldValueFromNode(element);
@@ -171,7 +167,7 @@ public class XmlUtil {
 			writer.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			logger.error("不能保存XML文件:{}", ex.getMessage());
+			LogUtil.log().error("不能保存XML文件:{}", ex.getMessage());
 		}
 	}
 

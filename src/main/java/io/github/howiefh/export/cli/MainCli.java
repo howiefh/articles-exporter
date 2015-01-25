@@ -24,10 +24,10 @@ import io.github.howiefh.util.LogUtil;
 public class MainCli {
 	public static void export(String[] args) {
 		try {
+			ArticleExporter.initRegisters();
 			ArticleExporter articleExporter = new ArticleExporter();
 			Config[] configs = {GeneralConfig.getInstance()};
 			ArticleExporter.initConfig(configs);
-			ArticleExporter.initRegisters();
 			if (initOptions(args)) {
 				articleExporter.process(ArticleExporter.articleList());
 			}

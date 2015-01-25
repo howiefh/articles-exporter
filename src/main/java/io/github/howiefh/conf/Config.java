@@ -26,6 +26,8 @@ public abstract class Config {
 	 * @param nodeElm:对象对应的节点
 	 */
 	public abstract boolean fetchFieldValueFromNode(Element nodeElm);
+	public abstract void init();
+	public abstract boolean validate();
 	
 	/**
 	 * 获取当前元素的名称

@@ -19,7 +19,7 @@ public class FreeTextField extends JTextField {
 
 	private JPopupMenu pop = null; // 弹出菜单
 
-	private JMenuItem copy = null, paste = null, cut = null; // 三个功能菜单
+	private JMenuItem copy = null, paste = null, cut = null,selectAll = null; // 三个功能菜单
 
 	public FreeTextField() {
 		super();
@@ -41,6 +41,7 @@ public class FreeTextField extends JTextField {
 					copy.setEnabled(isCanCopy());
 					paste.setEnabled(isClipboardString());
 					cut.setEnabled(isCanCopy());
+					selectAll.setEnabled(isCanSelectAll());
 					pop.show(FreeTextField.this, e.getX(), e.getY());
 				}
 			}
@@ -67,9 +68,11 @@ public class FreeTextField extends JTextField {
 		pop.add(copy = new JMenuItem("复制"));
 		pop.add(paste = new JMenuItem("粘贴"));
 		pop.add(cut = new JMenuItem("剪切"));
+		pop.add(selectAll = new JMenuItem("全选"));
 		copy.setAccelerator(KeyStroke.getKeyStroke('C', InputEvent.CTRL_MASK));
 		paste.setAccelerator(KeyStroke.getKeyStroke('V', InputEvent.CTRL_MASK));
 		cut.setAccelerator(KeyStroke.getKeyStroke('X', InputEvent.CTRL_MASK));
+		selectAll.setAccelerator(KeyStroke.getKeyStroke('A', InputEvent.CTRL_MASK));
 		copy.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				action(e);
@@ -85,7 +88,11 @@ public class FreeTextField extends JTextField {
 				action(e);
 			}
 		});
-		this.add(pop);
+		selectAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				action(e);
+			}
+		});
 	}
 
 	/**
@@ -101,6 +108,8 @@ public class FreeTextField extends JTextField {
 			this.paste();
 		} else if (str.equals(cut.getText())) { // 剪切
 			this.cut();
+		} else if (str.equals(selectAll.getText())) { // 全选
+			this.selectAll();
 		}
 	}
 
@@ -140,6 +149,13 @@ public class FreeTextField extends JTextField {
 		int start = this.getSelectionStart();
 		int end = this.getSelectionEnd();
 		if (start != end)
+			b = true;
+		return b;
+	}
+	public boolean isCanSelectAll() {
+		boolean b = false;
+		String text = this.getText();
+		if (!text.isEmpty())
 			b = true;
 		return b;
 	}

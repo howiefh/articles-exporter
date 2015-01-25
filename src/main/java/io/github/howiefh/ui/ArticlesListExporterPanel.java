@@ -16,8 +16,6 @@ import javax.swing.JLabel;
 
 import java.awt.GridBagConstraints;
 
-import javax.swing.JTextField;
-
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

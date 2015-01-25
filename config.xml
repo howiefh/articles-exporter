@@ -3,16 +3,16 @@
 <settings> 
   <general> 
     <version>0.0.1</version>  
-    <userAgent>UC</userAgent>  
-    <readTimeout>15000</readTimeout>  
-    <connectionTimeout>10100</connectionTimeout>  
+    <userAgent>PC</userAgent>  
+    <readTimeout>10000</readTimeout>  
+    <connectionTimeout>10000</connectionTimeout>  
     <cssPath>css</cssPath>  
     <mediaPath>media</mediaPath>  
     <jsPath>js</jsPath>  
-    <markdown>MARKDOWN</markdown>  
+    <markdown>GITHUB</markdown>  
     <threads>8</threads> 
   </general>  
   <ui>
-    <lookAndFeel>Nimbus</lookAndFeel>
+    <lookAndFeel>WebLookAndFeel</lookAndFeel>
   </ui>
 </settings>

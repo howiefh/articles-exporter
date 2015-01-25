@@ -72,6 +72,17 @@ public class IOUtil {
 	public static String cleanInvalidFileName(String fileName) {
 		return StringUtils.replaceEachRepeatedly(fileName, InvalidFileNameChars, replaceChars);
 	}
+	public static boolean validFileName(String fileName) {
+		if (fileName==null) {
+			return false;
+		}
+		for (int i = 0; i < InvalidFileNameChars.length; i++) {
+			if (fileName.contains(InvalidFileNameChars[i])) {
+				return false;
+			}
+		}
+		return true;
+	}
 	/**
 	 * 复制目录
 	 * @param orgPath

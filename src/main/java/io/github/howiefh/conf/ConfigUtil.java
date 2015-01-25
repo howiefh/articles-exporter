@@ -19,8 +19,15 @@ public class ConfigUtil {
 		try {
 			xmlUtil = new XmlUtil(CONFIG_PATH);
 			for (Config config : configs) {
-				xmlUtil.read(config);
-				LogUtil.log().info(config.toString());
+				try {
+					xmlUtil.read(config);
+					LogUtil.log().info(config.toString());
+					if (!config.validate()) {
+						initConfig(config);
+					}
+				} catch (Exception e) {
+					initConfig(config);
+				}
 			}
 			isLoadConfOK = true;
 		} catch (FileNotFoundException e) {
@@ -33,6 +40,15 @@ public class ConfigUtil {
 		return isLoadConfOK;
 	}
 	
+	public static void initConfig(Config config) {
+		try {
+			config.init();
+			xmlUtil = new XmlUtil(CONFIG_PATH, true);
+			xmlUtil.update(config);
+		} catch (FileNotFoundException e) {
+			LogUtil.log().error(e.getMessage());
+		}
+	}
 	public static void saveConfig(Config[] configs) {
 		try {
 			for (Config config : configs) {
