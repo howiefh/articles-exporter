@@ -4,13 +4,11 @@
 
 ## 截屏
 
-![](http://fh-1.qiniudn.com/ae_v0.1.0_main.png)
-![](http://fh-1.qiniudn.com/ae_v0.1.0_urls.png)
-![](http://fh-1.qiniudn.com/ae_v0.1.0_settings.png)
+![](http://fh-1.qiniudn.com/ae_v0.1.0_ui.png)
 
 ## 下载
 
-[百度网盘](http://pan.baidu.com/s/1bnHBmhh)
+[百度网盘](http://pan.baidu.com/s/1gd1oesj)
 
 ## 使用
 
