@@ -1,10 +1,13 @@
 package io.github.howiefh.ui;
 
+import io.github.howiefh.conf.GeneralConfig;
 import io.github.howiefh.conf.GeneralOptions;
 import io.github.howiefh.conf.PropertiesHelper;
 import io.github.howiefh.export.ArticleExporter;
 import io.github.howiefh.export.Message;
-import io.github.howiefh.ui.textfield.FreeTextField;
+import io.github.howiefh.renderer.util.JsoupUtil;
+import io.github.howiefh.ui.text.FreeTextField;
+import io.github.howiefh.util.IOUtil;
 import io.github.howiefh.util.LogUtil;
 
 import javax.swing.JPanel;
@@ -15,15 +18,18 @@ import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 
 import java.awt.GridBagConstraints;
-
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.JCheckBox;
+
+import org.jsoup.nodes.Document;
 
 public class ArticlesListExporterPanel extends JPanel {
 	private static final long serialVersionUID = -3096400336620302257L;
@@ -38,6 +44,7 @@ public class ArticlesListExporterPanel extends JPanel {
 	private SpinnerNumberModel pageCountNumberModel;
 	private JComboBox<String> comboBoxRule;
 	private JButton btnArticlesList;
+	private JCheckBox chckbxReversedOrder;
 	private MainPanel panel;
 	
 	private Message message;
@@ -48,10 +55,10 @@ public class ArticlesListExporterPanel extends JPanel {
 		this.message = message;
 		
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[]{60, 120, 60, 40, 60, 40, 60, 100, 60, 0};
+		gridBagLayout.columnWidths = new int[]{60, 120, 60, 40, 60, 40, 60, 100, 0, 60, 0};
 		int rowHeight = 0;
 		gridBagLayout.rowHeights = new int[]{rowHeight, rowHeight, rowHeight, rowHeight, rowHeight, rowHeight, rowHeight, rowHeight, rowHeight, rowHeight, 0};
-		gridBagLayout.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gridBagLayout.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		gridBagLayout.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		setLayout(gridBagLayout);
 		
@@ -123,17 +130,25 @@ public class ArticlesListExporterPanel extends JPanel {
 		gbc_comboBox.gridy = 0;
 		add(comboBoxRule, gbc_comboBox);
 		
+		chckbxReversedOrder = new JCheckBox("逆序");
+		chckbxReversedOrder.setSelected(true);
+		GridBagConstraints gbc_chckbxReversedOrder = new GridBagConstraints();
+		gbc_chckbxReversedOrder.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxReversedOrder.gridx = 8;
+		gbc_chckbxReversedOrder.gridy = 0;
+		add(chckbxReversedOrder, gbc_chckbxReversedOrder);
+		
 		btnArticlesList = new JButton("获取列表");
 		GridBagConstraints gbc_btnArticlesList = new GridBagConstraints();
-		gbc_btnArticlesList.insets = new Insets(5, 0, 5, 5);
-		gbc_btnArticlesList.gridx = 8;
+		gbc_btnArticlesList.insets = new Insets(5, 0, 5, 0);
+		gbc_btnArticlesList.gridx = 9;
 		gbc_btnArticlesList.gridy = 0;
 		add(btnArticlesList, gbc_btnArticlesList);
 		
-		panel = new MainPanel(message);
+		panel = new MainPanel(message, GeneralOptions.getInstance());
 		GridBagConstraints gbc_panel = new GridBagConstraints();
-		gbc_panel.insets = new Insets(5, 0, 5, 0);
-		gbc_panel.gridwidth = 9;
+		gbc_panel.insets = new Insets(5, 0, 0, 0);
+		gbc_panel.gridwidth = 10;
 		gbc_panel.gridheight = 9;
 		gbc_panel.fill = GridBagConstraints.BOTH;
 		gbc_panel.gridx = 0;
@@ -160,12 +175,26 @@ public class ArticlesListExporterPanel extends JPanel {
 				@Override
 				public void run() {
 					btnArticlesList.setEnabled(false);
+					try {
+						Document doc = JsoupUtil.get(String.format(textFieldLink.getText(), "1"), GeneralConfig.userAgent, GeneralConfig.connectionTimeout, GeneralConfig.readTimeout);
+						GeneralOptions.getInstance().setTitle(IOUtil.cleanInvalidFileName(doc.title()));
+					} catch (IOException e) {
+						GeneralOptions.getInstance().setTitle("out");
+						LogUtil.log().warn(e.getMessage());
+					} catch (Exception e) {
+						GeneralOptions.getInstance().setTitle("out");
+						LogUtil.log().warn(e.getMessage());
+					}
 					GeneralOptions.getInstance().setArticleListPageLink(textFieldLink.getText());
 					GeneralOptions.getInstance().setStartPage((Integer)startPageNumberModel.getValue());
 					GeneralOptions.getInstance().setPageCount((Integer)pageCountNumberModel.getValue());
 					GeneralOptions.getInstance().setRuleName((String)comboBoxRule.getSelectedItem());
 					try {
-						panel.fillTable(ArticleExporter.articleList());
+						if (chckbxReversedOrder.isSelected()) {
+							panel.fillTable(ArticleExporter.reverseArticleList());
+						} else {
+							panel.fillTable(ArticleExporter.articleList());
+						}
 					} catch (Exception e1) {
 						LogUtil.log().error(e1.getMessage());
 					} finally {

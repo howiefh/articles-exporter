@@ -14,6 +14,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import sun.misc.BASE64Decoder;
+
 public class IOUtil {
 	public static String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/39.0.2171.65 Chrome/39.0.2171.65 Safari/537.36";
 
@@ -50,6 +52,17 @@ public class IOUtil {
 		FileUtils.copyInputStreamToFile(in, destination);
 		in.close();
 	}
+	/** 
+     * 把base64图片数据转为本地图片 
+     * @param base64ImgData 
+     * @param filePath 
+     * @throws IOException 
+     */  
+    public static void convertBase64DataToImage(String base64ImgData,String filePath) throws IOException {  
+        BASE64Decoder d = new BASE64Decoder();
+        byte[] bs = d.decodeBuffer(base64ImgData); 
+        FileUtils.writeByteArrayToFile(new File(filePath), bs);
+    }  
 	public static String getExtension(String filename){
 		return FilenameUtils.getExtension(filename);
 	}

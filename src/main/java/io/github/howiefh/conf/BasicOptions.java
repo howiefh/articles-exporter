@@ -7,7 +7,9 @@ import java.util.List;
 public class BasicOptions {
 	protected String outDir="download/";
 	protected List<RendererTuple> rendererTuples;
-	
+	protected String title;
+	protected String ruleName;
+
 	protected BasicOptions(){}
 	public List<RendererTuple> getRendererTuples() {
 		return rendererTuples;
@@ -21,7 +23,20 @@ public class BasicOptions {
 	public void setOutDir(String outDir) {
 		this.outDir = outDir;
 	}
-	
+	public String getRuleName() {
+		return ruleName;
+	}
+	public void setRuleName(String ruleName) {
+		this.ruleName = ruleName;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
 	private static BasicOptions instance;
 	public static BasicOptions getInstance() {
 		if (null==instance) {

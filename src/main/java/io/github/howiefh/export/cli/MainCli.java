@@ -25,7 +25,7 @@ public class MainCli {
 	public static void export(String[] args) {
 		try {
 			ArticleExporter.initRegisters();
-			ArticleExporter articleExporter = new ArticleExporter();
+			ArticleExporter articleExporter = new ArticleExporter(GeneralOptions.getInstance());
 			Config[] configs = {GeneralConfig.getInstance()};
 			ArticleExporter.initConfig(configs);
 			if (initOptions(args)) {

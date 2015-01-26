@@ -2,7 +2,6 @@ package io.github.howiefh.conf;
 
 public class GeneralOptions extends BasicOptions{
 	protected String articleListPageLink;
-	protected String ruleName;
 	protected int pageCount;
 	protected int startPage;
 	
@@ -27,13 +26,6 @@ public class GeneralOptions extends BasicOptions{
 		this.startPage = startPage;
 	}
 	
-	public String getRuleName() {
-		return ruleName;
-	}
-	public void setRuleName(String ruleName) {
-		this.ruleName = ruleName;
-	}
-
 	private static GeneralOptions instance;
 	public static GeneralOptions getInstance() {
 		if (null==instance) {

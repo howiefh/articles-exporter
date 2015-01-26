@@ -1,4 +1,4 @@
-package io.github.howiefh.ui.textfield;
+package io.github.howiefh.ui.text;
 
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;

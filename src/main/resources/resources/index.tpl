@@ -7,6 +7,6 @@
  </head>
 <frameset cols="20%,*">
   <frame src="toc.html">
-  <frame src="#" name="showcontent">
+  <frame src="" name="showcontent">
 </frameset>
 </html>

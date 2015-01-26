@@ -1,6 +1,6 @@
 package io.github.howiefh.ui;
 
-import io.github.howiefh.conf.GeneralOptions;
+import io.github.howiefh.conf.BasicOptions;
 import io.github.howiefh.conf.RendererRegister;
 import io.github.howiefh.conf.RendererRegister.RendererTuple;
 import io.github.howiefh.export.ArticleExporter;
@@ -54,12 +54,14 @@ public class MainPanel extends JPanel implements Result{
 	private List<HtmlLink> links;
 	
 	private Message message;
+	private BasicOptions options;
 
 	/**
 	 * Create the panel.
 	 */
-	public MainPanel(Message message) {
+	public MainPanel(Message message, BasicOptions options) {
 		this.message = message;
+		this.options = options;
 		
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -212,25 +214,30 @@ public class MainPanel extends JPanel implements Result{
 				@Override
 				public void run() {
 					btnExport.setEnabled(false);
-					GeneralOptions.getInstance().setOutDir(textFieldOutDir.getText());
+					options.setOutDir(textFieldOutDir.getText());
 					List<RendererTuple> rendererTuples = new ArrayList<RendererTuple>();
 					for (String renderer : checkBoxs.keySet()) {
 						if (checkBoxs.get(renderer).isSelected()) {
 							rendererTuples.add(RendererRegister.getRendererTuple(renderer));
 						}
 					}
-					GeneralOptions.getInstance().setRendererTuples(rendererTuples);
+					options.setRendererTuples(rendererTuples);
 					
 					List<HtmlLink> newLinks = new ArrayList<HtmlLink>();
 					Object[] isSelected = scrollTablePane.getColumnData(0);
-					for (int i = 0; i < isSelected.length; i++) {
+					//判断条件由改为links.size(),修复重复导出List越界的问题
+					for (int i = 0; i < links.size(); i++) {
 						if ((Boolean)isSelected[i]) {
 							newLinks.add(links.get(i));
 						}
 					}
-					ArticleExporter articleExporter = new ArticleExporter();
-					ArticleExporter.setResult(MainPanel.this);
-					articleExporter.process(newLinks);
+					if (newLinks.size()>0) {
+						ArticleExporter articleExporter = new ArticleExporter(options);
+						ArticleExporter.setResult(MainPanel.this);
+						articleExporter.process(newLinks);
+					} else {
+						message.info("请选择需要导出的文章");
+					}
 					btnExport.setEnabled(true);
 				}
 			}).start();
@@ -251,7 +258,7 @@ public class MainPanel extends JPanel implements Result{
 		if (scrollTablePane.getRowCount() > index) {
 			scrollTablePane.setValueAt(msg, index, 2);
 		} else {
-			Object[] objects = {true, ArticleExporter.SINGLE_FILE_NAME, msg};
+			Object[] objects = {true, "", msg};
 			scrollTablePane.addRow(objects);
 		}
 	}

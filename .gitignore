@@ -3,8 +3,8 @@ download/
 target/
 log/
 temp/
-html/
-text/
-markdown/
-pdf/
+html/*.html
+text/*.txt
+markdown/*.md
+pdf/*.pdf
 bin/

@@ -60,14 +60,14 @@ public class PropertiesHelper {
 			LogUtil.log().error(e.getMessage());
 		}
 	}
-	public static String getListTitleSelector() {
-		return rules.get(GeneralOptions.getInstance().getRuleName()).getListTitleSelector();
+	public static String getListTitleSelector(String ruleName) {
+		return rules.get(ruleName).getListTitleSelector();
 	}
-	public static String getArticleTitleSelector() {
-		return rules.get(GeneralOptions.getInstance().getRuleName()).getArticleTitleSelector();
+	public static String getArticleTitleSelector(String ruleName) {
+		return rules.get(ruleName).getArticleTitleSelector();
 	}
-	public static String getArticleContentSelector() {
-		return rules.get(GeneralOptions.getInstance().getRuleName()).getArticleContentSelector();
+	public static String getArticleContentSelector(String ruleName) {
+		return rules.get(ruleName).getArticleContentSelector();
 	}
 	public class Rule {
 		private String listTitleSelector;

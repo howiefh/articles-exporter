@@ -49,7 +49,10 @@ public class MainFrame extends JFrame {
 		contentPane.add(statusBar, BorderLayout.SOUTH);
 		
 		ArticlesListExporterPanel panel = new ArticlesListExporterPanel(statusBar);
-		tabbedPane.addTab("导出文章列表", IOUtil.loadIcon("export.png"), panel, "导出文章列表中的文章到本地");
+		tabbedPane.addTab("导出文章", IOUtil.loadIcon("export.png"), panel, "指定包含页码的链接，按给定页码范围，导出链接页面文章列表中包含的文章");
+		
+		UrlListExporterPanel urlListExporterPanel = new UrlListExporterPanel(statusBar);
+		tabbedPane.addTab("指定列表页面", IOUtil.loadIcon("export.png"), urlListExporterPanel, "指定一组列表页面的链接，导出页面文章列表中包含的文章");
 		
 		SettingsPanel settingsPanel = new SettingsPanel(statusBar);
 		tabbedPane.addTab("设置", IOUtil.loadIcon("settings.png"), settingsPanel, "设置");
@@ -100,7 +103,7 @@ public class MainFrame extends JFrame {
 		}
 		setBounds(x, y+height/2, width, 0);
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(100);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}

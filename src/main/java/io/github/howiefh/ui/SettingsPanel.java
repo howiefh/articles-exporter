@@ -8,7 +8,7 @@ import io.github.howiefh.export.Message;
 import io.github.howiefh.renderer.Markdown;
 import io.github.howiefh.ui.conf.UIConfig;
 import io.github.howiefh.ui.conf.UIOptions;
-import io.github.howiefh.ui.textfield.FreeTextField;
+import io.github.howiefh.ui.text.FreeTextField;
 import io.github.howiefh.util.IOUtil;
 import io.github.howiefh.util.LogUtil;
 
@@ -20,7 +20,6 @@ import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 
 import java.awt.GridBagConstraints;
-
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

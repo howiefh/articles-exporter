@@ -24,7 +24,7 @@ public class GeneralConfig extends Config{
 	public static final int MIN_CONNECTION_TIMEOUT = 1000;
 	
 	public static final String USER_AGENT = "PC";
-	public static final int READ_TIMEOUT = 10 * 1000;
+	public static final int READ_TIMEOUT = 15 * 1000;
 	public static final int CONNECTION_TIMEOUT = 10 * 1000;
 	public static final String CSS_PATH = "css";
 	public static final String MEDIA_PATH = "media";
@@ -34,7 +34,7 @@ public class GeneralConfig extends Config{
 	/**
 	 * 软件版本号
 	 */
-	public static String version= "0.0.1";
+	public static String version= "0.1.0";
 	public static String userAgent = USER_AGENT;
 	public static int readTimeout = READ_TIMEOUT;
 	public static int connectionTimeout = CONNECTION_TIMEOUT;

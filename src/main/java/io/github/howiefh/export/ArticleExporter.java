@@ -2,7 +2,8 @@ package io.github.howiefh.export;
 
 import io.github.howiefh.conf.*;
 import io.github.howiefh.conf.RendererRegister.RendererTuple;
-import io.github.howiefh.parser.impl.HtmlArticleListParserImpl;
+import io.github.howiefh.parser.impl.ArticleListPagesParserImpl;
+import io.github.howiefh.parser.impl.ArticleListUrlsParserImpl;
 import io.github.howiefh.renderer.HtmlLink;
 import io.github.howiefh.renderer.PreProcesser;
 import io.github.howiefh.renderer.api.Renderer;
@@ -13,6 +14,7 @@ import io.github.howiefh.util.LogUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +36,7 @@ public class ArticleExporter {
 			+ "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">"
 			+ "<title></title>"
 			+ "<style type=\"text/css\">"
-			+ "body {font-family: SimSun;}"
+			+ "body {font-family: SimSun;font-size:12px;}"
 			+ "</style>"
 			+ "</head>"
 			+ "<body>";
@@ -47,19 +49,21 @@ public class ArticleExporter {
 	public final static String SINGLE_HTML = "shtml";
 	public final static String SINGLE_MARKDOWN = "smd";
 	public final static String SINGLE_TEXT = "stext";
-	public final static String SINGLE_FILE_NAME = "out";
+	protected String singleFilename = "out";
 	
-	private String encoding  = "UTF-8";
-	private ExecutorService executor = Executors.newFixedThreadPool(GeneralConfig.threads);
-	private File tempDir;
-	private List<HtmlLink> htmlLinks = new ArrayList<HtmlLink>();
-	private List<HtmlLink> errorLinks= new ArrayList<HtmlLink>();
-	private Map<UUID, String> articles = new HashMap<UUID, String>();
+	protected static int size = 0;
+	protected static Message message = new DefaultMessage();
+	protected static Result result = new DefaultResult();
 	
-	private static Message message = new DefaultMessage();
-	private static Result result = new DefaultResult();
+	protected String encoding  = "UTF-8";
+	protected BasicOptions options;
+	protected ExecutorService executor = Executors.newFixedThreadPool(GeneralConfig.threads);
+	protected File tempDir;
+	protected List<HtmlLink> htmlLinks = new ArrayList<HtmlLink>();
+	protected List<HtmlLink> errorLinks= new ArrayList<HtmlLink>();
+	protected Map<UUID, String> articles = new HashMap<UUID, String>();
 	
-	private static class DefaultResult implements Result{
+	protected static class DefaultResult implements Result{
 
 		@Override
 		public void result(int index, String msg) {
@@ -68,7 +72,7 @@ public class ArticleExporter {
 		}
 		
 	}
-	private static class DefaultMessage implements Message{
+	protected static class DefaultMessage implements Message{
 
 		@Override
 		public void warn(String text) {
@@ -87,10 +91,12 @@ public class ArticleExporter {
 		
 	}
 	
-	public ArticleExporter(){
-		
+	public ArticleExporter(BasicOptions options){
+		this.options = options;
+		setSingleFilename(options.getTitle());
 	}
-	public ArticleExporter(Message message){
+	public ArticleExporter(Message message, BasicOptions options){
+		this(options);
 		ArticleExporter.message = message;
 	}
 
@@ -119,16 +125,18 @@ public class ArticleExporter {
 	public static List<HtmlLink> articleList() throws Exception {
 		//获取列表
 		try {
-			HtmlArticleListParserImpl htmlArticleListParserImpl = new HtmlArticleListParserImpl(
+			ArticleListPagesParserImpl articleListParserImpl = new ArticleListPagesParserImpl(
+					GeneralOptions.getInstance().getArticleListPageLink(),
 					GeneralOptions.getInstance().getStartPage(),
 					GeneralOptions.getInstance().getPageCount(),
-					PropertiesHelper.getListTitleSelector()
+					PropertiesHelper.getListTitleSelector(GeneralOptions.getInstance().getRuleName())
 					);
-			htmlArticleListParserImpl.setConnectionTimeout(GeneralConfig.connectionTimeout);
-			htmlArticleListParserImpl.setReadTimeout(GeneralConfig.readTimeout);
-			htmlArticleListParserImpl.setUserAgent(GeneralConfig.userAgent);
+			articleListParserImpl.setConnectionTimeout(GeneralConfig.connectionTimeout);
+			articleListParserImpl.setReadTimeout(GeneralConfig.readTimeout);
+			articleListParserImpl.setUserAgent(GeneralConfig.userAgent);
 			message.info("获取文章列表...");
-			List<HtmlLink> links = htmlArticleListParserImpl.articleLinkList();
+			List<HtmlLink> links = articleListParserImpl.articleLinkList();
+			size = links.size();
 			message.info("共计"+links.size()+"篇文章");
 			return links;
 		} catch (Exception e) {
@@ -137,10 +145,42 @@ public class ArticleExporter {
 			throw e;
 		}
 	}
+	public static List<HtmlLink> reverseArticleList() throws Exception {
+		List<HtmlLink> links = articleList();
+		Collections.reverse(links);
+		return links;
+	}
+	
+	public static List<HtmlLink> urlsArticleList() throws Exception {
+		//获取列表
+		try {
+			ArticleListUrlsParserImpl urlsParserImpl = new ArticleListUrlsParserImpl(
+					UrlsOptions.getInstance().getUrls(), 
+					PropertiesHelper.getListTitleSelector(UrlsOptions.getInstance().getRuleName())
+					);
+			urlsParserImpl.setConnectionTimeout(GeneralConfig.connectionTimeout);
+			urlsParserImpl.setReadTimeout(GeneralConfig.readTimeout);
+			urlsParserImpl.setUserAgent(GeneralConfig.userAgent);
+			message.info("获取文章列表...");
+			List<HtmlLink> links = urlsParserImpl.articleLinkList();
+			size = links.size();
+			message.info("共计"+links.size()+"篇文章");
+			return links;
+		} catch (Exception e) {
+			LogUtil.log().error("获取文章列表失败:"+e.getMessage());
+			message.error("获取文章列表失败:"+e.getMessage());
+			throw e;
+		}
+	}
+	public static List<HtmlLink> reverseUrlsArticleList() throws Exception {
+		List<HtmlLink> links = urlsArticleList();
+		Collections.reverse(links);
+		return links;
+	}
 
 	private void deleteTemp() {
 		//删除临时文件
-		tempDir = new File(FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(),GeneralConfig.TEMP_PATH));
+		tempDir = new File(FilenameUtils.concat(options.getOutDir(),GeneralConfig.TEMP_PATH));
 		if (tempDir.exists()) {
 			try {
 				FileUtils.cleanDirectory(tempDir);
@@ -198,7 +238,7 @@ public class ArticleExporter {
 				throw new NullPointerException("预处理失败");
 			}
 			boolean isSingleFileAdded = false;
-			for (RendererTuple rendererTuple : GeneralOptions.getInstance().getRendererTuples()) {
+			for (RendererTuple rendererTuple : options.getRendererTuples()) {
 				if (rendererTuple.isSingleFile) {
 					if (!isSingleFileAdded) {
 						articles.put(htmlLink.getUuid(), doc.body().html());
@@ -206,7 +246,7 @@ public class ArticleExporter {
 					}
 					continue;
 				}
-				String filePath = FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(),
+				String filePath = FilenameUtils.concat(options.getOutDir(),
 						rendererTuple.renderer.path()+IOUtil.cleanInvalidFileName(htmlLink.getContent())+rendererTuple.renderer.postfix());
 				write(rendererTuple.renderer, doc, filePath, encoding);
 			}
@@ -218,7 +258,7 @@ public class ArticleExporter {
 	private  Document preProcess(HtmlLink htmlLink) {
 		try {
 			PreProcesser preProcesser = new PreProcesser();
-			preProcesser.setSelector(PropertiesHelper.getArticleContentSelector());
+			preProcesser.setSelector(PropertiesHelper.getArticleContentSelector(options.getRuleName()));
 			preProcesser.setConnectionTimeout(GeneralConfig.connectionTimeout);
 			preProcesser.setReadTimeout(GeneralConfig.readTimeout);
 			preProcesser.setMediaPath(GeneralConfig.mediaPath);
@@ -237,13 +277,14 @@ public class ArticleExporter {
 		return null;
 	}
 	private  void saveToSingleFileAndCopyResources() {
+		//使能在列表后显示相关提示信息，修复提示信息每次向列表后追加的问题(对已有提示，应该替换旧的提示)
+		int listSize = size;
 		//后续处理,对生成单文件的生成单文件，拷贝资源文件
-		int size = htmlLinks.size();
-		for (RendererTuple rendererTuple : GeneralOptions.getInstance().getRendererTuples()) {
+		for (RendererTuple rendererTuple : options.getRendererTuples()) {
 			try {
 				if (rendererTuple.isSingleFile) {
-					String filePath = FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(),
-							rendererTuple.renderer.path()+SINGLE_FILE_NAME+rendererTuple.renderer.postfix());
+					String filePath = FilenameUtils.concat(options.getOutDir(),
+							rendererTuple.renderer.path()+singleFilename+rendererTuple.renderer.postfix());
 					
 					Element element = articleSingleFileLinkList(htmlLinks);
 					StringBuilder res = new StringBuilder();
@@ -255,10 +296,10 @@ public class ArticleExporter {
 					res.append(AFTER_HTML);
 					
 					Document document = Jsoup.parse(res.toString());
-					document.title(SINGLE_FILE_NAME);
+					document.title(singleFilename);
 					
 					if (rendererTuple.renderer instanceof PDFRendererImpl) {
-						File pdfBaseURLPath = new File(FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(), GeneralConfig.TEMP_PATH)); 
+						File pdfBaseURLPath = new File(FilenameUtils.concat(options.getOutDir(), GeneralConfig.TEMP_PATH)); 
 						((PDFRendererImpl)rendererTuple.renderer).setBaseURL(pdfBaseURLPath.toURI().toString());
 						document.select("meta").remove();
 						document.head().append(generateBookmark(htmlLinks));
@@ -267,20 +308,22 @@ public class ArticleExporter {
 					} else {
 						write(rendererTuple.renderer, document, filePath, encoding);
 					}
-					result.result(size++,rendererTuple.renderer.postfix() + "文件导出成功");
+					result.result(listSize++,singleFilename+rendererTuple.renderer.postfix() + "文件导出成功");
 					continue;
 				}
 				IOUtil.copyDirectory(tempDir.getAbsolutePath(),
-						FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(),rendererTuple.renderer.path()));
+						FilenameUtils.concat(options.getOutDir(),rendererTuple.renderer.path()));
 				if (rendererTuple.renderer instanceof HtmlRendererImpl && !rendererTuple.isSingleFile) {
-					rendererTuple.renderer.write(FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(),"toc.html"), articleFrameLinkList(htmlLinks), encoding);
+					rendererTuple.renderer.write(FilenameUtils.concat(options.getOutDir(),"toc.html"), articleFrameLinkList(htmlLinks), encoding);
 					File src = new File(IOUtil.getResource("index.tpl").getFile());
-					File dest = new File(FilenameUtils.concat(GeneralOptions.getInstance().getOutDir(),"index.html"));
+					File dest = new File(FilenameUtils.concat(options.getOutDir(),"index.html"));
 					FileUtils.copyFile(src,dest);
 				}
 			} catch (Exception e) {
 				LogUtil.log().error(e.getMessage());
-				result.result(size++,rendererTuple.renderer.postfix() + "文件导出失败");
+				if (rendererTuple.isSingleFile) {
+					result.result(listSize++,singleFilename+rendererTuple.renderer.postfix() + "文件导出失败");
+				}
 			}
 		}
 	}
@@ -342,5 +385,11 @@ public class ArticleExporter {
 	}
 	public static void setResult(Result result) {
 		ArticleExporter.result = result;
+	}
+	public String getSingleFilename() {
+		return singleFilename;
+	}
+	public void setSingleFilename(String singleFilename) {
+		this.singleFilename = singleFilename;
 	}
 }

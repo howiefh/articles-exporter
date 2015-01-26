@@ -94,6 +94,10 @@ public class PreProcesser {
 		List<HtmlLink> list = getHtmlFileLinks(doc);// 根据url抓取网页中找到css样式链接地址及文件名
 		for (HtmlLink hLink : list) {
 			try {
+				if (hLink.getType()==LinkType.DATAURL) {
+					IOUtil.convertBase64DataToImage(hLink.getHref(), FilenameUtils.concat(filepath, hLink.getContent()));
+					continue;
+				}
 				IOUtil.copyURLToFile(hLink.getHref()
 				, new File(FilenameUtils.concat(filepath, hLink.getContent()))
 				, connectionTimeout, readTimeout);
@@ -127,7 +131,11 @@ public class PreProcesser {
 			String path = this.mediaPath;
 			boolean isRealLink=false;
 			if (link.tagName().equals("img")) {
-				isRealLink = true;
+				if (link.attr("src").startsWith("data:")) {
+					htmlLinks.add(getAndRenameDataUrl(link, path, "src"));
+				} else {
+					isRealLink = true;
+				}
 			}
 			if (link.tagName().equals("input")) {
 				if (link.attr("type").equals("image")) {
@@ -156,6 +164,33 @@ public class PreProcesser {
 		String src = link.attr("abs:"+attr);
 		HtmlLink htmlLink = new HtmlLink(src);
 		String filename = FilenameUtils.concat(path,htmlLink.getUuid()+"-" + getRealName(src));
+		htmlLink.setContent(filename);
+		link.attr(attr, filename);
+		return htmlLink;
+	}
+	
+	private HtmlLink getAndRenameDataUrl(Element link, String path, String attr){
+		String gif = "data:image/gif;base64,";
+		String png = "data:image/png;base64,";
+		String jpeg = "data:image/jpeg;base64,";
+		String icon = "data:image/x-icon;base64,";
+		String src = link.attr("src");
+		String ext = "";
+		if (src.startsWith(gif)) {
+			src = src.substring(gif.length());
+			ext = ".gif";
+		} else if (src.startsWith(png)) {
+			src = src.substring(png.length());
+			ext = ".png";
+		} else if (src.startsWith(jpeg)) {
+			src = src.substring(jpeg.length());
+			ext = ".jpg";
+		} else if (src.startsWith(icon)) {
+			src = src.substring(icon.length());
+			ext = ".ico";
+		}
+		HtmlLink htmlLink = new HtmlLink(src,LinkType.DATAURL);
+		String filename = FilenameUtils.concat(path,htmlLink.getUuid()+ext);
 		htmlLink.setContent(filename);
 		link.attr(attr, filename);
 		return htmlLink;
