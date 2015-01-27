@@ -5,6 +5,7 @@ import io.github.howiefh.conf.RendererRegister.RendererTuple;
 import io.github.howiefh.parser.impl.ArticleListPagesParserImpl;
 import io.github.howiefh.parser.impl.ArticleListUrlsParserImpl;
 import io.github.howiefh.renderer.HtmlLink;
+import io.github.howiefh.renderer.LinkType;
 import io.github.howiefh.renderer.PreProcesser;
 import io.github.howiefh.renderer.api.Renderer;
 import io.github.howiefh.renderer.impl.*;
@@ -60,6 +61,7 @@ public class ArticleExporter {
 	protected ExecutorService executor = Executors.newFixedThreadPool(GeneralConfig.threads);
 	protected File tempDir;
 	protected List<HtmlLink> htmlLinks = new ArrayList<HtmlLink>();
+	protected int total = 0;
 	protected List<HtmlLink> errorLinks= new ArrayList<HtmlLink>();
 	protected Map<UUID, String> articles = new HashMap<UUID, String>();
 	
@@ -194,14 +196,13 @@ public class ArticleExporter {
 	public  void process(List<HtmlLink> links) {
 		long start = new Date().getTime();
 		this.htmlLinks = links;
-		LogUtil.log().info("将导出"+links.size()+"篇文章");
-		message.info("将导出"+links.size()+"篇文章");
+		total = 0;
 		deleteTemp();
 		saveToMultifiles();
 		saveToSingleFileAndCopyResources();
 		long end = new Date().getTime();
 		int error = errorLinks.size();
-		int success = links.size()-error;
+		int success = total-error;
 		LogUtil.log().info("任务完成，导出"+success+"篇，"+(error==0?"":error+"篇失败，")+"用时："+(end-start)+"毫秒");
 		message.info("任务完成，导出"+success+"篇，"+(error==0?"":error+"篇失败，")+"用时："+(end-start)+"毫秒");
 	}
@@ -210,6 +211,10 @@ public class ArticleExporter {
 		//一篇文章导出到一个文件
 		int len = htmlLinks.size();
 		for (int i = 0; i < len; i++) {
+			if (htmlLinks.get(i).getType()==LinkType.USELESS) {
+				continue;
+			}
+			total++;
 			execute(htmlLinks.get(i), i);
 		}
 		executor.shutdown();
@@ -315,9 +320,10 @@ public class ArticleExporter {
 						FilenameUtils.concat(options.getOutDir(),rendererTuple.renderer.path()));
 				if (rendererTuple.renderer instanceof HtmlRendererImpl && !rendererTuple.isSingleFile) {
 					rendererTuple.renderer.write(FilenameUtils.concat(options.getOutDir(),"toc.html"), articleFrameLinkList(htmlLinks), encoding);
-					File src = new File(IOUtil.getResource("index.tpl").getFile());
 					File dest = new File(FilenameUtils.concat(options.getOutDir(),"index.html"));
-					FileUtils.copyFile(src,dest);
+					//FileUtils.copyFile(new File(IOUtil.getResource("index.tpl").getFile()),dest);会提示找不到文件
+					//fix Source 'file:/home/fh/project/articles-exporter/bin/articles-exporter.jar!/resources/index.tpl' does not exist
+					FileUtils.copyURLToFile(IOUtil.getResource("index.tpl"), dest);
 				}
 			} catch (Exception e) {
 				LogUtil.log().error(e.getMessage());

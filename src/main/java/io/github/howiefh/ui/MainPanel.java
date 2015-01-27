@@ -7,9 +7,11 @@ import io.github.howiefh.export.ArticleExporter;
 import io.github.howiefh.export.Message;
 import io.github.howiefh.export.Result;
 import io.github.howiefh.renderer.HtmlLink;
+import io.github.howiefh.renderer.LinkType;
 import io.github.howiefh.ui.handle.ChooseFileHandler;
 import io.github.howiefh.ui.table.JCheckBoxHeaderTable;
 import io.github.howiefh.ui.table.JCheckBoxHeaderTable.Status;
+import io.github.howiefh.util.LogUtil;
 
 import javax.swing.JPanel;
 
@@ -223,18 +225,22 @@ public class MainPanel extends JPanel implements Result{
 					}
 					options.setRendererTuples(rendererTuples);
 					
-					List<HtmlLink> newLinks = new ArrayList<HtmlLink>();
 					Object[] isSelected = scrollTablePane.getColumnData(0);
-					//判断条件由改为links.size(),修复重复导出List越界的问题
+					int count = 0;
+					//判断条件由改为links.size(),修复重复导出List links会越界的问题
 					for (int i = 0; i < links.size(); i++) {
 						if ((Boolean)isSelected[i]) {
-							newLinks.add(links.get(i));
+							count++;
+						} else {
+							links.get(i).setType(LinkType.USELESS);
 						}
 					}
-					if (newLinks.size()>0) {
+					if (count>0) {
+						LogUtil.log().info("将导出"+count+"篇文章");
+						message.info("将导出"+count+"篇文章");
 						ArticleExporter articleExporter = new ArticleExporter(options);
 						ArticleExporter.setResult(MainPanel.this);
-						articleExporter.process(newLinks);
+						articleExporter.process(links);
 					} else {
 						message.info("请选择需要导出的文章");
 					}
