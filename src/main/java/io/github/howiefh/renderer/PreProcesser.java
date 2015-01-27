@@ -103,10 +103,10 @@ public class PreProcesser {
 				, connectionTimeout, readTimeout);
 			} catch (MalformedURLException e) {
 				LogUtil.log().error("地址 :" + hLink.getHref() + " 链接错误."+e.getMessage());
-				continue;
 			} catch (IOException e) {
 				LogUtil.log().error("地址 :" + hLink.getHref() + " 链接超时."+e.getMessage());
-				continue;
+			} catch (Exception e) {
+				LogUtil.log().error("地址 :" + hLink.getHref() + " ."+e.getMessage());
 			}
 		}
 	}

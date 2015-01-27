@@ -33,6 +33,7 @@ import java.util.Map;
 
 import javax.swing.JTextField;
 import javax.swing.JButton;
+import javax.swing.table.TableColumn;
 
 public class MainPanel extends JPanel implements Result{
 
@@ -167,6 +168,10 @@ public class MainPanel extends JPanel implements Result{
 		btnExport.addActionListener(new exportHandler());
 		
 		scrollTablePane = new JCheckBoxHeaderTable(columnNames, data);
+		TableColumn lastColumn = scrollTablePane.getTable().getColumnModel().getColumn(2);
+		lastColumn.setMaxWidth(512);
+		lastColumn.setMinWidth(256);
+		lastColumn.setPreferredWidth(356);
 		GridBagConstraints gbc_scrollTablePane = new GridBagConstraints();
 		gbc_scrollTablePane.insets = new Insets(0, 5, 0, 5);
 		gbc_scrollTablePane.gridwidth = 9;
@@ -223,6 +228,11 @@ public class MainPanel extends JPanel implements Result{
 							rendererTuples.add(RendererRegister.getRendererTuple(renderer));
 						}
 					}
+					if (rendererTuples.size()==0) {
+						message.warn("请选择导出格式");
+						btnExport.setEnabled(true);
+						return;
+					}
 					options.setRendererTuples(rendererTuples);
 					
 					Object[] isSelected = scrollTablePane.getColumnData(0);
@@ -230,6 +240,7 @@ public class MainPanel extends JPanel implements Result{
 					//判断条件由改为links.size(),修复重复导出List links会越界的问题
 					for (int i = 0; i < links.size(); i++) {
 						if ((Boolean)isSelected[i]) {
+							links.get(i).setType(LinkType.LINK);
 							count++;
 						} else {
 							links.get(i).setType(LinkType.USELESS);
@@ -242,7 +253,7 @@ public class MainPanel extends JPanel implements Result{
 						ArticleExporter.setResult(MainPanel.this);
 						articleExporter.process(links);
 					} else {
-						message.info("请选择需要导出的文章");
+						message.warn("请选择需要导出的文章");
 					}
 					btnExport.setEnabled(true);
 				}
@@ -260,7 +271,7 @@ public class MainPanel extends JPanel implements Result{
 	}
 
 	@Override
-	public void result(int index, String msg) {
+	public <T> void result(int index, T msg) {
 		if (scrollTablePane.getRowCount() > index) {
 			scrollTablePane.setValueAt(msg, index, 2);
 		} else {

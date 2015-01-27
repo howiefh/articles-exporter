@@ -25,6 +25,10 @@ public class IOUtil {
             int readTimeout)
      throws IOException{
 		URL url = new URL(source);
+		//有的文章里包含file:的链接
+		if (!url.getProtocol().equals("http")&&!url.getProtocol().equals("https")) {
+			return;
+		}
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		conn.setReadTimeout(readTimeout);
 		conn.setConnectTimeout(connectionTimeout);

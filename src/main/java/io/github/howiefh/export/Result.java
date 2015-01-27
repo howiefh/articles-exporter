@@ -1,5 +1,5 @@
 package io.github.howiefh.export;
 
 public interface Result {
-	void result(int index,String msg);
+	<T> void result(int index,T msg);
 }

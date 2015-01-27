@@ -35,6 +35,13 @@ public class JCheckBoxHeaderTable extends JScrollPane{
 			public Class<?> getColumnClass(int column) {
 				return getValueAt(0, column).getClass();
 			}
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				if (column==0) {
+					return true;
+				}
+				return false;
+			}
 		};
 		table = new JTable(dtm);
 		dtm.addTableModelListener(new HeaderCheckBoxHandler(table));

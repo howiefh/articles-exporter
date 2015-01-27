@@ -68,7 +68,7 @@ public class ArticleExporter {
 	protected static class DefaultResult implements Result{
 
 		@Override
-		public void result(int index, String msg) {
+		public <T> void result(int index, T msg) {
 			// TODO Auto-generated method stub
 			
 		}
@@ -180,19 +180,6 @@ public class ArticleExporter {
 		return links;
 	}
 
-	private void deleteTemp() {
-		//删除临时文件
-		tempDir = new File(FilenameUtils.concat(options.getOutDir(),GeneralConfig.TEMP_PATH));
-		if (tempDir.exists()) {
-			try {
-				FileUtils.cleanDirectory(tempDir);
-			} catch (IOException e) {
-				LogUtil.log().error("删除目录"+tempDir+"失败."+e.getMessage());
-				message.error("删除目录"+tempDir+"失败."+e.getMessage());
-			}
-		}
-	}
-
 	public  void process(List<HtmlLink> links) {
 		long start = new Date().getTime();
 		this.htmlLinks = links;
@@ -205,6 +192,19 @@ public class ArticleExporter {
 		int success = total-error;
 		LogUtil.log().info("任务完成，导出"+success+"篇，"+(error==0?"":error+"篇失败，")+"用时："+(end-start)+"毫秒");
 		message.info("任务完成，导出"+success+"篇，"+(error==0?"":error+"篇失败，")+"用时："+(end-start)+"毫秒");
+	}
+	
+	private void deleteTemp() {
+		//删除临时文件
+		tempDir = new File(FilenameUtils.concat(options.getOutDir(),GeneralConfig.TEMP_PATH));
+		if (tempDir.exists()) {
+			try {
+				FileUtils.cleanDirectory(tempDir);
+			} catch (IOException e) {
+				LogUtil.log().error("删除目录"+tempDir+"失败."+e.getMessage());
+				message.error("删除目录"+tempDir+"失败."+e.getMessage());
+			}
+		}
 	}
 
 	private  void saveToMultifiles() {
