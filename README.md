@@ -8,7 +8,8 @@
 
 ## 下载
 
-[百度网盘](http://pan.baidu.com/s/1gd1oesj)
+[百度网盘](http://pan.baidu.com/s/1kTooFD9)
+[jre7_x64](http://pan.baidu.com/s/1eQ8HG8E) : 精简jre，可能还存在一些未知问题，最好是安装官方原始版本。
 
 ## 使用
 
