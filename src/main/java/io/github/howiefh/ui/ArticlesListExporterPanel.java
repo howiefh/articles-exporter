@@ -140,14 +140,14 @@ public class ArticlesListExporterPanel extends JPanel {
 		
 		btnArticlesList = new JButton("获取列表");
 		GridBagConstraints gbc_btnArticlesList = new GridBagConstraints();
-		gbc_btnArticlesList.insets = new Insets(5, 0, 5, 0);
+		gbc_btnArticlesList.insets = new Insets(5, 0, 5, 5);
 		gbc_btnArticlesList.gridx = 9;
 		gbc_btnArticlesList.gridy = 0;
 		add(btnArticlesList, gbc_btnArticlesList);
 		
 		panel = new MainPanel(message, GeneralOptions.getInstance());
 		GridBagConstraints gbc_panel = new GridBagConstraints();
-		gbc_panel.insets = new Insets(5, 0, 0, 0);
+		gbc_panel.insets = new Insets(5, 0, 5, 0);
 		gbc_panel.gridwidth = 10;
 		gbc_panel.gridheight = 9;
 		gbc_panel.fill = GridBagConstraints.BOTH;

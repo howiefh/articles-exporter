@@ -34,19 +34,6 @@ public class PDFRendererImpl implements Renderer{
 
 	private static PDFRendererImpl instance;
 	private PDFRendererImpl(){
-        try {
-        	// 费时
-			renderer = new ITextRenderer();  
-			
-	        // 解决中文支持问题       
-	        fontResolver = renderer.getFontResolver();      
-	        File fontFile = new File("fonts/simsun.ttc");
-			fontResolver.addFont(fontFile.getAbsolutePath(), BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-		} catch (DocumentException e) {
-			LogUtil.log().error(e.getMessage());
-		} catch (IOException e) {
-			LogUtil.log().error(e.getMessage());
-		}   
 	}
 	
 	public static Renderer getInstance() {
@@ -69,7 +56,15 @@ public class PDFRendererImpl implements Renderer{
 	}
 	@Override
 	public void write(String filepath,Document doc, String encoding) throws Exception{
-		try {
+        try {
+        	// 费时
+			renderer = new ITextRenderer();  
+			
+	        // 解决中文支持问题       
+	        fontResolver = renderer.getFontResolver();      
+	        File fontFile = new File("fonts/simsun.ttc");
+			fontResolver.addFont(fontFile.getAbsolutePath(), BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+			
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance()
 					.newDocumentBuilder();
 			org.w3c.dom.Document pdfdoc = builder.parse(new ByteArrayInputStream(parse(doc)

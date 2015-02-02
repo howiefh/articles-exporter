@@ -109,7 +109,7 @@ public class UrlListExporterPanel extends JPanel {
 		
 		panel = new MainPanel(message,UrlsOptions.getInstance());
 		GridBagConstraints gbc_panel = new GridBagConstraints();
-		gbc_panel.insets = new Insets(5, 0, 0, 5);
+		gbc_panel.insets = new Insets(5, 0, 5, 0);
 		gbc_panel.gridwidth = 9;
 		gbc_panel.gridheight = 9;
 		gbc_panel.fill = GridBagConstraints.BOTH;

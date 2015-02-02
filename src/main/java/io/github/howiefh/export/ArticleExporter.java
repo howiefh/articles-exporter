@@ -38,6 +38,10 @@ public class ArticleExporter {
 			+ "<title></title>"
 			+ "<style type=\"text/css\">"
 			+ "body {font-family: SimSun;font-size:12px;}"
+			+ "img { page-break-inside: avoid;"
+			+ "max-width: 500px;"
+			+ "width: 500px;"
+			+ "overflow:hidden; }"
 			+ "</style>"
 			+ "</head>"
 			+ "<body>";
@@ -342,7 +346,9 @@ public class ArticleExporter {
 		Document document = Jsoup.parse("<ol></ol>");
 		Element element = document.select("ol").first();
 		for (HtmlLink htmlLink : links) {
-			element.append("<li><a href='#"+htmlLink.getUuid()+"'>"+htmlLink.getContent()+"</a></li>");
+			if (htmlLink.getType()==LinkType.LINK) {
+				element.append("<li><a href='#"+htmlLink.getUuid()+"'>"+htmlLink.getContent()+"</a></li>");
+			}
 		}
 		return element;
 	}
@@ -351,7 +357,9 @@ public class ArticleExporter {
 		document.head().append("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
 		Element element = document.select("ol").first();
 		for (HtmlLink htmlLink : links) {
-			element.append("<li><a href='html/"+IOUtil.cleanInvalidFileName(htmlLink.getContent())+".html' target='showcontent'>"+htmlLink.getContent()+"</a></li>");
+			if (htmlLink.getType()==LinkType.LINK) {
+				element.append("<li><a href='html/"+IOUtil.cleanInvalidFileName(htmlLink.getContent())+".html' target='showcontent'>"+htmlLink.getContent()+"</a></li>");
+			}
 		}
 		return document;
 	}
@@ -360,10 +368,12 @@ public class ArticleExporter {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("<bookmarks>");
 		for (HtmlLink htmlLink : links) {
-			stringBuilder.append("<bookmark name=\"");
-			stringBuilder.append(htmlLink.getContent() + "\"");
-			stringBuilder.append(" href=\"#");
-			stringBuilder.append(htmlLink.getUuid()+"\"/>");
+			if (htmlLink.getType()==LinkType.LINK) {
+				stringBuilder.append("<bookmark name=\"");
+				stringBuilder.append(htmlLink.getContent() + "\"");
+				stringBuilder.append(" href=\"#");
+				stringBuilder.append(htmlLink.getUuid()+"\"/>");
+			}
 		}
 		stringBuilder.append("</bookmarks>");
 		return stringBuilder.toString();
