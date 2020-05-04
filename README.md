@@ -4,7 +4,7 @@
 
 ## 截屏
 
-![](http://fh-1.qiniudn.com/ae_v0.1.0_ui.png)
+![](img/ae_v0.1.0_ui.png)
 
 ## 下载
 
